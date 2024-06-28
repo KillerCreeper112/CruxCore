@@ -1,0 +1,7 @@
+name: CruxCore
+version: '1.0'
+main: killercreepr.cruxcore.CruxCore
+api-version: '1.18'
+description: Thee foundation.
+commands:
+  reloadcruxe:

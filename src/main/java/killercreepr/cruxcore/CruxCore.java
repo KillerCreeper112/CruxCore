@@ -1,0 +1,122 @@
+package killercreepr.cruxcore;
+
+import killercreepr.crux.Crux;
+import killercreepr.crux.CruxMainModule;
+import killercreepr.crux.plugin.CruxPlugin;
+import killercreepr.crux.registries.CruxModuleRegistry;
+import killercreepr.crux.registries.CruxRegistries;
+import killercreepr.cruxattributes.CruxAttributesModule;
+import killercreepr.cruxblocks.CruxBlocksModule;
+import killercreepr.cruxconfig.CruxConfigsModule;
+import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
+import killercreepr.cruxconfig.config.registry.CfgRegistries;
+import killercreepr.cruxenchants.CruxEnchantsModule;
+import killercreepr.cruxentities.CruxEntitiesModule;
+import killercreepr.cruxitems.CruxItemsModule;
+import killercreepr.cruxmenus.CruxMenusModule;
+import killercreepr.cruxpotions.CruxPotionsModule;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
+
+public class CruxCore extends CruxPlugin {
+    private static CruxCore instance;
+    public static CruxCore inst(){ return instance; }
+    protected final CruxModuleRegistry MODULES = CruxRegistries.MODULES;
+    protected final CruxMainModule CRUX_CORE = new CruxMainModule();
+    protected final CruxItemsModule CRUX_ITEMS = new CruxItemsModule();
+    protected final CruxMenusModule CRUX_MENUS = new CruxMenusModule();
+    protected final CruxConfigsModule CRUX_CONFIGS = new CruxConfigsModule();
+    protected final CruxPotionsModule CRUX_POTIONS = new CruxPotionsModule();
+    protected final CruxAttributesModule CRUX_ATTRIBUTES = new CruxAttributesModule();
+    protected final CruxEntitiesModule CRUX_ENTITIES = new CruxEntitiesModule();
+    protected final CruxEnchantsModule CRUX_ENCHANTS = new CruxEnchantsModule();
+    protected final CruxBlocksModule CRUX_BLOCKS = new CruxBlocksModule();
+
+    public @NotNull CruxBlocksModule cruxBlocks(){
+        return CRUX_BLOCKS;
+    }
+    public @NotNull CruxMenusModule cruxMenus(){ return CRUX_MENUS; }
+
+    public CruxModuleRegistry modules() {
+        return MODULES;
+    }
+
+    public CruxMainModule cruxCore() {
+        return CRUX_CORE;
+    }
+
+    public CruxItemsModule cruxItems() {
+        return CRUX_ITEMS;
+    }
+
+    public CruxConfigsModule cruxConfigs() {
+        return CRUX_CONFIGS;
+    }
+
+    public CruxPotionsModule cruxPotions() {
+        return CRUX_POTIONS;
+    }
+
+    public CruxAttributesModule cruxAttributes() {
+        return CRUX_ATTRIBUTES;
+    }
+
+    public CruxEntitiesModule cruxEntities() {
+        return CRUX_ENTITIES;
+    }
+
+    public CruxEnchantsModule cruxEnchants() {
+        return CRUX_ENCHANTS;
+    }
+
+    @Override
+    public void enabled() {
+        instance = this;
+        Crux.setMainPlugin(this);
+        super.enabled();
+
+        //register modules.
+        //they will automatically add in their listeners
+        MODULES.register(
+            CRUX_CORE,
+            CRUX_CONFIGS,
+            CRUX_ITEMS,
+            CRUX_MENUS,
+            CRUX_POTIONS,
+            CRUX_ATTRIBUTES,
+            CRUX_ENTITIES,
+            CRUX_ENCHANTS,
+            CRUX_BLOCKS
+        ).enable(this);
+        CRUX_ITEMS.registerGeneralDisplayFormatter();
+
+        CRUX_BLOCKS.blockTick().runTaskTimer(this, 20L, 1L);
+
+        BukkitCfgHandlers.init(CfgRegistries.JSON);
+        BukkitCfgHandlers.init(CfgRegistries.YAML);
+        BukkitCfgHandlers.initJson(CfgRegistries.JSON);
+        BukkitCfgHandlers.initYaml(CfgRegistries.YAML);
+
+        reloadConfigs();
+    }
+
+    @Override
+    public void disabled() {
+        super.disabled();
+        MODULES.unregisterAll(this);
+    }
+
+    @Override
+    public void reloadConfigs() {
+        super.reloadConfigs();
+        //CRUX_CONFIGS.reload(this);
+        MODULES.reload(this);
+    }
+
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        reloadConfigs();
+        return super.onCommand(sender, command, label, args);
+    }
+}
