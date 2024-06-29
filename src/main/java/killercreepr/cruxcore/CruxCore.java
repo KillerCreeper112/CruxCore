@@ -98,7 +98,7 @@ public class CruxCore extends CruxPlugin {
         BukkitCfgHandlers.initJson(CfgRegistries.JSON);
         BukkitCfgHandlers.initYaml(CfgRegistries.YAML);
 
-        reloadConfigs();
+        reload();
     }
 
     @Override
@@ -108,15 +108,17 @@ public class CruxCore extends CruxPlugin {
     }
 
     @Override
-    public void reloadConfigs() {
-        super.reloadConfigs();
+    public void reload() {
+        super.reload();
         //CRUX_CONFIGS.reload(this);
         MODULES.reload(this);
+
+        CruxRegistries.PLUGINS.forEach(plugin -> plugin.reload(this));
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        reloadConfigs();
+        reload();
         return super.onCommand(sender, command, label, args);
     }
 }
