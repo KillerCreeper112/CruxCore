@@ -23,14 +23,12 @@ dependencies {
         "E:\\Plugins\\Crux2.0\\crux\\CruxConfigs\\build\\libs\\CruxConfigs-1.0-dev.jar",
     ))
 
-    compileOnly(fileTree("libs") {
+    /*compileOnly(fileTree("libs") {
         include("*.jar")
-    })
+    })*/
 }
 
-tasks{
-    paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
-}
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
 allprojects{
 

@@ -113,7 +113,10 @@ public class CruxCore extends CruxPlugin {
         //CRUX_CONFIGS.reload(this);
         MODULES.reload(this);
 
-        CruxRegistries.PLUGINS.forEach(plugin -> plugin.reload(this));
+        CruxRegistries.PLUGINS.forEach(plugin ->{
+            if(plugin instanceof CruxCore) return;
+            plugin.reload(this);
+        });
     }
 
     @Override
