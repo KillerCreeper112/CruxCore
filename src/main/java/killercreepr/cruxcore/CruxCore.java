@@ -15,11 +15,18 @@ import killercreepr.cruxentities.CruxEntitiesModule;
 import killercreepr.cruxitems.CruxItemsModule;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
+import net.essentialsx.api.v2.events.chat.GlobalChatEvent;
+import net.essentialsx.api.v2.events.chat.LocalChatEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class CruxCore extends CruxPlugin {
+public class CruxCore extends CruxPlugin implements Listener {
     private static CruxCore instance;
     public static CruxCore inst(){ return instance; }
     protected final CruxModuleRegistry MODULES = CruxRegistries.MODULES;
@@ -70,6 +77,13 @@ public class CruxCore extends CruxPlugin {
         return CRUX_ENCHANTS;
     }
 
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+        Bukkit.broadcastMessage(event.getFormat());
+        event.setFormat(event.getFormat().replace("{TEST}", "Test once again :D"));
+    }
+
     @Override
     public void enabled() {
         instance = this;
@@ -99,7 +113,10 @@ public class CruxCore extends CruxPlugin {
         BukkitCfgHandlers.initYaml(CfgRegistries.YAML);
 
         reload();
+        registerListeners(this);
     }
+
+
 
     @Override
     public void disabled() {
