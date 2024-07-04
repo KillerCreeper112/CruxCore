@@ -5,6 +5,7 @@ import killercreepr.crux.CruxMainModule;
 import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.crux.registries.CruxModuleRegistry;
 import killercreepr.crux.registries.CruxRegistries;
+import killercreepr.crux.util.CruxString;
 import killercreepr.cruxattributes.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
@@ -17,6 +18,8 @@ import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
 import net.essentialsx.api.v2.events.chat.GlobalChatEvent;
 import net.essentialsx.api.v2.events.chat.LocalChatEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -80,8 +83,10 @@ public class CruxCore extends CruxPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        Bukkit.broadcastMessage(event.getFormat());
-        event.setFormat(event.getFormat().replace("{TEST}", "Test once again :D"));
+        Bukkit.broadcast(
+            Component.text(CruxString.latinFont(event.getMessage()))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, CruxString.latinFont(event.getMessage())))
+        );
     }
 
     @Override
