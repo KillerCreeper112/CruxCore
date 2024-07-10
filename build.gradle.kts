@@ -21,6 +21,7 @@ dependencies {
         "E:\\Plugins\\Crux2.0\\crux\\CruxItems\\build\\libs\\CruxItems-1.0-dev.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxBlocks\\build\\libs\\CruxBlocks-1.0-dev.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxConfigs\\build\\libs\\CruxConfigs-1.0-dev.jar",
+        "E:\\Plugins\\Crux2.0\\crux\\CruxStructures\\build\\libs\\CruxStructures-1.0-dev.jar",
     ))
 
     compileOnly(files("D:\\EssentialsX-2.21.0-dev+100-b392f03.jar"))
@@ -29,6 +30,11 @@ dependencies {
     /*compileOnly(fileTree("libs") {
         include("*.jar")
     })*/
+}
+tasks{
+    runServer{
+        jvmArgs("-Xmx4000M", "-Xms4000M")
+    }
 }
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION

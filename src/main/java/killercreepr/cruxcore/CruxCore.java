@@ -16,6 +16,7 @@ import killercreepr.cruxentities.CruxEntitiesModule;
 import killercreepr.cruxitems.CruxItemsModule;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
+import killercreepr.cruxstructures.CruxStructuresModule;
 import net.essentialsx.api.v2.events.chat.GlobalChatEvent;
 import net.essentialsx.api.v2.events.chat.LocalChatEvent;
 import net.kyori.adventure.text.Component;
@@ -42,11 +43,16 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxEntitiesModule CRUX_ENTITIES = new CruxEntitiesModule();
     protected final CruxEnchantsModule CRUX_ENCHANTS = new CruxEnchantsModule();
     protected final CruxBlocksModule CRUX_BLOCKS = new CruxBlocksModule();
+    protected final CruxStructuresModule CRUX_STRUCTURES = new CruxStructuresModule();
 
     public @NotNull CruxBlocksModule cruxBlocks(){
         return CRUX_BLOCKS;
     }
     public @NotNull CruxMenusModule cruxMenus(){ return CRUX_MENUS; }
+
+    public CruxStructuresModule cruxStructures() {
+        return CRUX_STRUCTURES;
+    }
 
     public CruxModuleRegistry modules() {
         return MODULES;
@@ -106,7 +112,8 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_ATTRIBUTES,
             CRUX_ENTITIES,
             CRUX_ENCHANTS,
-            CRUX_BLOCKS
+            CRUX_BLOCKS,
+            CRUX_STRUCTURES
         ).enable(this);
         CRUX_ITEMS.registerGeneralDisplayFormatter();
 
