@@ -3,5 +3,12 @@ version: '1.0'
 main: killercreepr.cruxcore.CruxCore
 api-version: '1.19'
 description: Thee foundation.
+load: STARTUP
 commands:
   reloadcruxe:
+dependencies:
+  server:
+    FastAsyncWorldEdit:
+      load: BEFORE
+      required: false # Defaults to true
+      join-classpath: true # Defaults to true

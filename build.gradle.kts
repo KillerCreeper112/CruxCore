@@ -33,7 +33,7 @@ dependencies {
 }
 tasks{
     runServer{
-        jvmArgs("-Xmx4000M", "-Xms4000M")
+        jvmArgs("-Xmx12000M", "-Xms12000M")
     }
 }
 
