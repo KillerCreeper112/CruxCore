@@ -6,6 +6,7 @@ description: Thee foundation.
 load: STARTUP
 commands:
   reloadcruxe:
+    description: test
 dependencies:
   server:
     FastAsyncWorldEdit:
