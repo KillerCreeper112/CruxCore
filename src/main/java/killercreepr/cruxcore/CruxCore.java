@@ -17,14 +17,12 @@ import killercreepr.cruxitems.CruxItemsModule;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
 import killercreepr.cruxstructures.CruxStructuresModule;
-import net.essentialsx.api.v2.events.chat.GlobalChatEvent;
-import net.essentialsx.api.v2.events.chat.LocalChatEvent;
+import killercreepr.cruxstructures.manager.StructureManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -96,11 +94,16 @@ public class CruxCore extends CruxPlugin implements Listener {
         );
     }
 
+    protected final StructureManager structureManager = new StructureManager(this);
+
+    public StructureManager structureManager() {
+        return structureManager;
+    }
+
     @Override
     public void enabled() {
         instance = this;
         Crux.setMainPlugin(this);
-        super.enabled();
 
         //register modules.
         //they will automatically add in their listeners
@@ -130,7 +133,6 @@ public class CruxCore extends CruxPlugin implements Listener {
     }
 
 
-
     @Override
     public void disabled() {
         super.disabled();
@@ -147,6 +149,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             if(plugin instanceof CruxCore) return;
             plugin.reload(this);
         });
+        structureManager.loadConfiguration();
     }
 
     @Override
