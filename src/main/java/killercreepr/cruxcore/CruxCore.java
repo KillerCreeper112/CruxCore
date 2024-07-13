@@ -100,6 +100,7 @@ public class CruxCore extends CruxPlugin implements Listener {
         return structureManager;
     }
 
+    boolean firstTime = true;
     @Override
     public void enabled() {
         instance = this;
@@ -129,7 +130,14 @@ public class CruxCore extends CruxPlugin implements Listener {
         BukkitCfgHandlers.initYaml(CfgRegistries.YAML);
 
         reload();
-        registerListeners(this);
+        registerListeners(
+            this,
+            structureManager
+        );
+        structureManager.buildRunnable().runTaskTimer(this, 20L, 1L);
+        getServer().getScheduler().runTaskLater(this, task ->{
+            structureManager.loadConfiguration();
+        }, 10L);
     }
 
 
@@ -137,6 +145,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     public void disabled() {
         super.disabled();
         MODULES.unregisterAll(this);
+        structureManager.saveAllWorlds();
     }
 
     @Override
@@ -149,6 +158,11 @@ public class CruxCore extends CruxPlugin implements Listener {
             if(plugin instanceof CruxCore) return;
             plugin.reload(this);
         });
+
+        if(firstTime){
+            firstTime = false;
+            return;
+        }
         structureManager.loadConfiguration();
     }
 
