@@ -108,6 +108,7 @@ public class CruxCore extends CruxPlugin implements Listener {
 
         //register modules.
         //they will automatically add in their listeners
+        CRUX_STRUCTURES.registerCommands(this, structureManager);
         MODULES.register(
             CRUX_CORE,
             CRUX_CONFIGS,
