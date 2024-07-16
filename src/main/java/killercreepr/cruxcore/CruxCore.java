@@ -20,6 +20,7 @@ import killercreepr.cruxstructures.CruxStructuresModule;
 import killercreepr.cruxstructures.manager.StructureManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.minecraft.world.level.biome.BiomeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -136,9 +137,6 @@ public class CruxCore extends CruxPlugin implements Listener {
             structureManager
         );
         structureManager.buildRunnable().runTaskTimer(this, 20L, 1L);
-        getServer().getScheduler().runTaskLater(this, task ->{
-            structureManager.loadConfiguration();
-        }, 10L);
     }
 
 
@@ -160,10 +158,6 @@ public class CruxCore extends CruxPlugin implements Listener {
             plugin.reload(this);
         });
 
-        if(firstTime){
-            firstTime = false;
-            return;
-        }
         structureManager.loadConfiguration();
     }
 
