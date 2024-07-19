@@ -11,6 +11,8 @@ import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
 import killercreepr.cruxconfig.config.registry.CfgRegistries;
+import killercreepr.cruxcore.command.CruxCoreCommands;
+import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxenchants.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
 import killercreepr.cruxitems.CruxItemsModule;
@@ -20,7 +22,6 @@ import killercreepr.cruxstructures.CruxStructuresModule;
 import killercreepr.cruxstructures.manager.StructureManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.minecraft.world.level.biome.BiomeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -107,6 +108,8 @@ public class CruxCore extends CruxPlugin implements Listener {
         instance = this;
         Crux.setMainPlugin(this);
 
+        new CruxCoreCommands(this).register(this);
+
         //register modules.
         //they will automatically add in their listeners
         CRUX_STRUCTURES.registerCommands(this, structureManager);
@@ -123,6 +126,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_STRUCTURES
         ).enable(this);
         CRUX_ITEMS.registerGeneralDisplayFormatter();
+        Crux.buildTickRunnable().runTaskTimer(this, 20L, 1L);
 
         CRUX_BLOCKS.blockTick().runTaskTimer(this, 20L, 1L);
 
@@ -134,7 +138,8 @@ public class CruxCore extends CruxPlugin implements Listener {
         reload();
         registerListeners(
             this,
-            structureManager
+            structureManager,
+            new PlayerDataListener()
         );
         structureManager.buildRunnable().runTaskTimer(this, 20L, 1L);
     }
