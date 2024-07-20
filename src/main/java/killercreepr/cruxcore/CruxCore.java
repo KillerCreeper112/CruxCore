@@ -87,7 +87,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         return CRUX_ENCHANTS;
     }
 
-
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         Bukkit.broadcast(
@@ -102,7 +101,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         return structureManager;
     }
 
-    boolean firstTime = true;
     @Override
     public void enabled() {
         instance = this;
