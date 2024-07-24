@@ -102,15 +102,26 @@ public class CruxCore extends CruxPlugin implements Listener {
     }
 
     @Override
-    public void enabled() {
+    public void onLoad() {
         instance = this;
         Crux.setMainPlugin(this);
 
         new CruxCoreCommands(this).register(this);
 
+        CRUX_STRUCTURES.registerCommands(this, structureManager);
+
+        BukkitCfgHandlers.init(CfgRegistries.JSON);
+        BukkitCfgHandlers.init(CfgRegistries.YAML);
+        BukkitCfgHandlers.initJson(CfgRegistries.JSON);
+        BukkitCfgHandlers.initYaml(CfgRegistries.YAML);
+
+        super.onLoad();
+    }
+
+    @Override
+    public void enabled() {
         //register modules.
         //they will automatically add in their listeners
-        CRUX_STRUCTURES.registerCommands(this, structureManager);
         MODULES.register(
             CRUX_CORE,
             CRUX_CONFIGS,
@@ -127,11 +138,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         Crux.buildTickRunnable().runTaskTimer(this, 20L, 1L);
 
         CRUX_BLOCKS.blockTick().runTaskTimer(this, 20L, 1L);
-
-        BukkitCfgHandlers.init(CfgRegistries.JSON);
-        BukkitCfgHandlers.init(CfgRegistries.YAML);
-        BukkitCfgHandlers.initJson(CfgRegistries.JSON);
-        BukkitCfgHandlers.initYaml(CfgRegistries.YAML);
 
         reload();
         registerListeners(
