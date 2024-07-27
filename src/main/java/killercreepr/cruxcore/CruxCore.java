@@ -15,6 +15,7 @@ import killercreepr.cruxcore.command.CruxCoreCommands;
 import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxenchants.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
+import killercreepr.cruxexternal.CruxExternalModule;
 import killercreepr.cruxitems.CruxItemsModule;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
@@ -45,7 +46,11 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxEnchantsModule CRUX_ENCHANTS = new CruxEnchantsModule();
     protected final CruxBlocksModule CRUX_BLOCKS = new CruxBlocksModule();
     protected final CruxStructuresModule CRUX_STRUCTURES = new CruxStructuresModule();
+    protected final CruxExternalModule CRUX_EXTERNAL = new CruxExternalModule();
 
+    public CruxExternalModule cruxExternal(){
+        return CRUX_EXTERNAL;
+    }
     public @NotNull CruxBlocksModule cruxBlocks(){
         return CRUX_BLOCKS;
     }
@@ -115,13 +120,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         BukkitCfgHandlers.initJson(CfgRegistries.JSON);
         BukkitCfgHandlers.initYaml(CfgRegistries.YAML);
 
-        super.onLoad();
-    }
-
-    @Override
-    public void enabled() {
-        //register modules.
-        //they will automatically add in their listeners
         MODULES.register(
             CRUX_CORE,
             CRUX_CONFIGS,
@@ -132,8 +130,18 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_ENTITIES,
             CRUX_ENCHANTS,
             CRUX_BLOCKS,
-            CRUX_STRUCTURES
-        ).enable(this);
+            CRUX_STRUCTURES,
+            CRUX_EXTERNAL
+        ).load(this);
+
+        super.onLoad();
+    }
+
+    @Override
+    public void enabled() {
+        //enable modules.
+        //they will automatically add in their listeners
+        MODULES.enable(this);
         CRUX_ITEMS.registerGeneralDisplayFormatter();
         Crux.buildTickRunnable().runTaskTimer(this, 20L, 1L);
 

@@ -13,3 +13,7 @@ dependencies:
       load: BEFORE
       required: false # Defaults to true
       join-classpath: true # Defaults to true
+    HeadDatabase:
+      load: BEFORE
+      required: false
+      join-classpath: true
