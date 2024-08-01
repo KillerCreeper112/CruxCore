@@ -6,6 +6,7 @@ import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.crux.registries.CruxModuleRegistry;
 import killercreepr.crux.registries.CruxRegistries;
 import killercreepr.crux.util.CruxString;
+import killercreepr.cruxadvancements.CruxAdvancementsModule;
 import killercreepr.cruxattributes.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
@@ -47,9 +48,13 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxBlocksModule CRUX_BLOCKS = new CruxBlocksModule();
     protected final CruxStructuresModule CRUX_STRUCTURES = new CruxStructuresModule();
     protected final CruxExternalModule CRUX_EXTERNAL = new CruxExternalModule();
+    protected final CruxAdvancementsModule CRUX_ADVANCEMENTS = new CruxAdvancementsModule();
 
     public CruxExternalModule cruxExternal(){
         return CRUX_EXTERNAL;
+    }
+    public CruxAdvancementsModule cruxAdvancements(){
+        return CRUX_ADVANCEMENTS;
     }
     public @NotNull CruxBlocksModule cruxBlocks(){
         return CRUX_BLOCKS;
@@ -131,7 +136,8 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_ENCHANTS,
             CRUX_BLOCKS,
             CRUX_STRUCTURES,
-            CRUX_EXTERNAL
+            CRUX_EXTERNAL,
+            CRUX_ADVANCEMENTS
         ).load(this);
 
         super.onLoad();
