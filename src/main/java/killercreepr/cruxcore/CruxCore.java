@@ -37,7 +37,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     private static CruxCore instance;
     public static CruxCore inst(){ return instance; }
     protected final CruxModuleRegistry MODULES = CruxRegistries.MODULES;
-    protected final CruxMainModule CRUX_CORE = new CruxMainModule();
+    protected final CruxMainModule CRUX_MAIN = new CruxMainModule();
     protected final CruxItemsModule CRUX_ITEMS = new CruxItemsModule();
     protected final CruxMenusModule CRUX_MENUS = new CruxMenusModule();
     protected final CruxConfigsModule CRUX_CONFIGS = new CruxConfigsModule();
@@ -69,8 +69,8 @@ public class CruxCore extends CruxPlugin implements Listener {
         return MODULES;
     }
 
-    public CruxMainModule cruxCore() {
-        return CRUX_CORE;
+    public CruxMainModule cruxMain() {
+        return CRUX_MAIN;
     }
 
     public CruxItemsModule cruxItems() {
@@ -126,7 +126,7 @@ public class CruxCore extends CruxPlugin implements Listener {
         BukkitCfgHandlers.initYaml(CfgRegistries.YAML);
 
         MODULES.register(
-            CRUX_CORE,
+            CRUX_MAIN,
             CRUX_CONFIGS,
             CRUX_ITEMS,
             CRUX_MENUS,
