@@ -1,5 +1,6 @@
 package killercreepr.cruxcore.command;
 
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -7,8 +8,10 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.plugin.CruxPlugin;
+import killercreepr.crux.util.CruxMath;
 import killercreepr.cruxcore.CruxCore;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -28,6 +31,20 @@ public class CruxCoreCommands {
                 .requires(source -> source.getSender().hasPermission("cruxcore.cmds.cruxcore.use")),
                 plugin.getLifecycleManager());
             commands.register(cmd, List.of("ccore"));
+            commands.register(
+                Commands.literal("flightspeed")
+                    .then(
+                        Commands.argument("value", DoubleArgumentType.doubleArg())
+                            .executes(ctx ->{
+                                if(!(getExecutor(ctx.getSource()) instanceof Player p)) return -1;
+                                double value = ctx.getArgument("value", Double.class);
+                                p.setFlySpeed((float) CruxMath.clamp(value, -1D, 1D));
+                                p.sendMessage("Set fly speed to " + value);
+                                return 1;
+                            })
+                    )
+                    .build(), List.of("fs")
+            );
         });
     }
 

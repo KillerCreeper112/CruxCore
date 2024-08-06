@@ -7,6 +7,14 @@ plugins {
     alias(libs.plugins.kotlin)
 }
 
+repositories{
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    implementation("com.github.Maxlego08:zAuctionHouseV3-API:3.1.4.5")
+}
+
 dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     //Crux Modules
