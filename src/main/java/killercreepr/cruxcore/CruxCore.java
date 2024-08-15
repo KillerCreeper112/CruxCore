@@ -11,7 +11,6 @@ import killercreepr.cruxattributes.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
-import killercreepr.cruxconfig.config.registry.CfgRegistries;
 import killercreepr.cruxcore.command.CruxCoreCommands;
 import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxenchants.CruxEnchantsModule;
@@ -120,10 +119,7 @@ public class CruxCore extends CruxPlugin implements Listener {
 
         CRUX_STRUCTURES.registerCommands(this, structureManager);
 
-        BukkitCfgHandlers.init(CfgRegistries.JSON);
-        BukkitCfgHandlers.init(CfgRegistries.YAML);
-        BukkitCfgHandlers.initJson(CfgRegistries.JSON);
-        BukkitCfgHandlers.initYaml(CfgRegistries.YAML);
+        BukkitCfgHandlers.initStandard();
 
         MODULES.register(
             CRUX_MAIN,
@@ -161,7 +157,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         );
         structureManager.buildRunnable().runTaskTimer(this, 20L, 1L);
     }
-
 
     @Override
     public void disabled() {

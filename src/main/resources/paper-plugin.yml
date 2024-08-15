@@ -4,9 +4,6 @@ main: killercreepr.cruxcore.CruxCore
 api-version: '1.19'
 description: Thee foundation.
 load: STARTUP
-commands:
-  reloadcruxe:
-    description: test
 dependencies:
   server:
     FastAsyncWorldEdit:

@@ -28,14 +28,10 @@ dependencies {
         "E:\\Plugins\\Crux2.0\\crux\\CruxEnchants\\build\\libs\\CruxEnchants-1.0-dev.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxItems\\build\\libs\\CruxItems-1.0-dev.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxBlocks\\build\\libs\\CruxBlocks-1.0-dev.jar",
-        "E:\\Plugins\\Crux2.0\\crux\\CruxConfigs\\build\\libs\\CruxConfigs-1.0-dev.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxStructures\\build\\libs\\CruxStructures-1.0-dev.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxExternal\\build\\libs\\CruxExternal-1.0.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxAdvancements\\build\\libs\\CruxAdvancements-1.0-dev.jar",
     ))
-
-    compileOnly(files("D:\\EssentialsX-2.21.0-dev+100-b392f03.jar"))
-    compileOnly(files("D:\\EssentialsXChat-2.21.0-dev+102-fcf6e64.jar"))
 
     /*compileOnly(fileTree("libs") {
         include("*.jar")
