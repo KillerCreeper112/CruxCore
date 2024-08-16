@@ -12,6 +12,7 @@ import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
 import killercreepr.cruxcore.command.CruxCoreCommands;
+import killercreepr.cruxcore.listener.ItemStackListener;
 import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxenchants.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
@@ -153,7 +154,8 @@ public class CruxCore extends CruxPlugin implements Listener {
         registerListeners(
             this,
             structureManager,
-            new PlayerDataListener()
+            new PlayerDataListener(),
+            new ItemStackListener(this)
         );
         structureManager.buildRunnable().runTaskTimer(this, 20L, 1L);
     }
