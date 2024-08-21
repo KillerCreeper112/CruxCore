@@ -146,9 +146,8 @@ public class CruxCore extends CruxPlugin implements Listener {
         //they will automatically add in their listeners
         MODULES.enable(this);
         CRUX_ITEMS.registerGeneralDisplayFormatter();
-        Crux.buildTickRunnable().runTaskTimer(this, 20L, 1L);
 
-        CRUX_BLOCKS.blockTick().runTaskTimer(this, 20L, 1L);
+        CRUX_BLOCKS.blockTick().runTaskTimerAsynchronously(this, 20L, 1L);
 
         reload();
         registerListeners(
@@ -157,7 +156,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             new PlayerDataListener(),
             new ItemStackListener(this)
         );
-        structureManager.buildRunnable().runTaskTimer(this, 20L, 1L);
+        structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
     }
 
     @Override
@@ -172,7 +171,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         super.reload();
         //CRUX_CONFIGS.reload(this);
         MODULES.reload(this);
-
         CruxRegistries.PLUGINS.forEach(plugin ->{
             if(plugin instanceof CruxCore) return;
             plugin.reload(this);
