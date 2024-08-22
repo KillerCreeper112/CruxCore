@@ -147,7 +147,7 @@ public class CruxCore extends CruxPlugin implements Listener {
         MODULES.enable(this);
         CRUX_ITEMS.registerGeneralDisplayFormatter();
 
-        CRUX_BLOCKS.blockTick().runTaskTimerAsynchronously(this, 20L, 1L);
+        CRUX_BLOCKS.blockTick().runTaskTimer(this, 20L, 1L);//todo better block tick
 
         reload();
         registerListeners(
