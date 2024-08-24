@@ -17,11 +17,15 @@ import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxenchants.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
 import killercreepr.cruxexternal.CruxExternalModule;
+import killercreepr.cruxgeneration.CruxGenerationModule;
 import killercreepr.cruxitems.CruxItemsModule;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
 import killercreepr.cruxstructures.CruxStructuresModule;
 import killercreepr.cruxstructures.manager.StructureManager;
+import killercreepr.cruxworlds.CruxWorldsModule;
+import killercreepr.cruxworlds.world.manager.CruxWorldManager;
+import killercreepr.cruxworlds.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
@@ -49,9 +53,14 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxStructuresModule CRUX_STRUCTURES = new CruxStructuresModule();
     protected final CruxExternalModule CRUX_EXTERNAL = new CruxExternalModule();
     protected final CruxAdvancementsModule CRUX_ADVANCEMENTS = new CruxAdvancementsModule();
+    protected final CruxGenerationModule CRUX_GENERATION = new CruxGenerationModule();
+    protected final CruxWorldsModule CRUX_WORLDS = new CruxWorldsModule();
 
     public CruxExternalModule cruxExternal(){
         return CRUX_EXTERNAL;
+    }
+    public CruxWorldsModule cruxWorlds(){
+        return CRUX_WORLDS;
     }
     public CruxAdvancementsModule cruxAdvancements(){
         return CRUX_ADVANCEMENTS;
@@ -96,6 +105,9 @@ public class CruxCore extends CruxPlugin implements Listener {
     public CruxEnchantsModule cruxEnchants() {
         return CRUX_ENCHANTS;
     }
+    public CruxGenerationModule cruxGeneration() {
+        return CRUX_GENERATION;
+    }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
@@ -109,6 +121,11 @@ public class CruxCore extends CruxPlugin implements Listener {
 
     public StructureManager structureManager() {
         return structureManager;
+    }
+    protected final SimpleCruxWorldManager worldManager = new SimpleCruxWorldManager();
+
+    public CruxWorldManager worldManager() {
+        return worldManager;
     }
 
     @Override
@@ -134,7 +151,9 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_BLOCKS,
             CRUX_STRUCTURES,
             CRUX_EXTERNAL,
-            CRUX_ADVANCEMENTS
+            CRUX_ADVANCEMENTS,
+            CRUX_GENERATION,
+            CRUX_WORLDS
         ).load(this);
 
         super.onLoad();
@@ -154,7 +173,8 @@ public class CruxCore extends CruxPlugin implements Listener {
             this,
             structureManager,
             new PlayerDataListener(),
-            new ItemStackListener(this)
+            new ItemStackListener(this),
+            worldManager
         );
         structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
     }

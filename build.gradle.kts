@@ -31,6 +31,8 @@ dependencies {
         "E:\\Plugins\\Crux2.0\\crux\\CruxStructures\\build\\libs\\CruxStructures-1.0-dev.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxExternal\\build\\libs\\CruxExternal-1.0.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxAdvancements\\build\\libs\\CruxAdvancements-1.0-dev.jar",
+        "E:\\Plugins\\Crux2.0\\crux\\CruxGeneration\\build\\libs\\CruxGeneration-1.0.jar",
+        "E:\\Plugins\\Crux2.0\\crux\\CruxWorlds\\build\\libs\\CruxWorlds-1.0-dev.jar",
     ))
 
     /*compileOnly(fileTree("libs") {
