@@ -10,7 +10,10 @@ import killercreepr.cruxadvancements.CruxAdvancementsModule;
 import killercreepr.cruxattributes.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
+import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
+import killercreepr.cruxconfig.config.bukkit.loader.ItemTagLoader;
+import killercreepr.cruxconfig.config.bukkit.loader.LootTableLoader;
 import killercreepr.cruxcore.command.CruxCoreCommands;
 import killercreepr.cruxcore.listener.ItemStackListener;
 import killercreepr.cruxcore.listener.PlayerDataListener;
@@ -132,6 +135,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     public void onLoad() {
         instance = this;
         Crux.setMainPlugin(this);
+        loadTags();
 
         new CruxCoreCommands(this).register(this);
 
@@ -186,15 +190,26 @@ public class CruxCore extends CruxPlugin implements Listener {
         structureManager.saveAllWorlds();
     }
 
+    public void loadTags(){
+        new ItemTagLoader().loadConfiguration(
+            new CruxFolder(this, "tags/item").file()
+        );
+    }
+
     @Override
     public void reload() {
         super.reload();
+        loadTags();
         //CRUX_CONFIGS.reload(this);
         MODULES.reload(this);
         CruxRegistries.PLUGINS.forEach(plugin ->{
             if(plugin instanceof CruxCore) return;
             plugin.reload(this);
         });
+
+        new LootTableLoader().loadConfiguration(
+            new CruxFolder(this, "loot_tables").file()
+        );
 
         structureManager.loadConfiguration();
     }
