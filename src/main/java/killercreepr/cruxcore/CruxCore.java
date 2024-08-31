@@ -12,6 +12,7 @@ import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
 import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
+import killercreepr.cruxconfig.config.bukkit.loader.BlockSoundGroupLoader;
 import killercreepr.cruxconfig.config.bukkit.loader.ItemTagLoader;
 import killercreepr.cruxconfig.config.bukkit.loader.LootTableLoader;
 import killercreepr.cruxcore.command.CruxCoreCommands;
@@ -25,6 +26,7 @@ import killercreepr.cruxitems.CruxItemsModule;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
 import killercreepr.cruxstructures.CruxStructuresModule;
+import killercreepr.cruxstructures.event.StructurePlaceEvent;
 import killercreepr.cruxstructures.manager.StructureManager;
 import killercreepr.cruxworlds.CruxWorldsModule;
 import killercreepr.cruxworlds.world.manager.CruxWorldManager;
@@ -32,6 +34,7 @@ import killercreepr.cruxworlds.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
@@ -120,6 +123,15 @@ public class CruxCore extends CruxPlugin implements Listener {
         );
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onStructurePlace(StructurePlaceEvent event) {
+        Location l = event.getLocation();
+        Bukkit.broadcast(Component.text(
+            "[CruxCore] Structure " + event.getStructure().key() + " spawned at " + l.getBlockX() + ", " + l.getBlockY() + ", " + l.getBlockZ
+                ()
+        ).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/teleport " + l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ())));
+    }
+
     protected final StructureManager structureManager = new StructureManager(this);
 
     public StructureManager structureManager() {
@@ -135,13 +147,14 @@ public class CruxCore extends CruxPlugin implements Listener {
     public void onLoad() {
         instance = this;
         Crux.setMainPlugin(this);
+        BukkitCfgHandlers.initStandard();
+
         loadTags();
+        loadBlockSoundGroups();
 
         new CruxCoreCommands(this).register(this);
 
         CRUX_STRUCTURES.registerCommands(this, structureManager);
-
-        BukkitCfgHandlers.initStandard();
 
         MODULES.register(
             CRUX_MAIN,
@@ -196,6 +209,12 @@ public class CruxCore extends CruxPlugin implements Listener {
         );
     }
 
+    public void loadBlockSoundGroups(){
+        new BlockSoundGroupLoader().loadConfiguration(
+            new CruxFolder(this, "block/sound_groups").file()
+        );
+    }
+
     @Override
     public void reload() {
         super.reload();
@@ -210,6 +229,8 @@ public class CruxCore extends CruxPlugin implements Listener {
         new LootTableLoader().loadConfiguration(
             new CruxFolder(this, "loot_tables").file()
         );
+
+        loadBlockSoundGroups();
 
         structureManager.loadConfiguration();
     }
