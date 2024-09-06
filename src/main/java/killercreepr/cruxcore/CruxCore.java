@@ -127,8 +127,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     public void onStructurePlace(StructurePlaceEvent event) {
         Location l = event.getLocation();
         Bukkit.broadcast(Component.text(
-            "[CruxCore] Structure " + event.getStructure().key() + " spawned at " + l.getBlockX() + ", " + l.getBlockY() + ", " + l.getBlockZ
-                ()
+            "[CruxCore] Structure " + event.getStructure().key() + " spawned at " + l.getBlockX() + ", " + l.getBlockY() + ", " + l.getBlockZ()
         ).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/teleport " + l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ())));
     }
 
