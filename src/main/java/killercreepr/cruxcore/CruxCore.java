@@ -231,6 +231,10 @@ public class CruxCore extends CruxPlugin implements Listener {
         loadBlockSoundGroups();
 
         structureManager.loadConfiguration();
+
+        CruxCore.inst().cruxMenus().menuRegistry().loadConfiguration(
+            new CruxFolder(this, "menus").file()
+        );
     }
 
     @Override
