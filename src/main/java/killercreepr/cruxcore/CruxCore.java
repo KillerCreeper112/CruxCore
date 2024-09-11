@@ -14,6 +14,7 @@ import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
 import killercreepr.cruxconfig.config.bukkit.loader.BlockSoundGroupLoader;
 import killercreepr.cruxconfig.config.bukkit.loader.ItemTagLoader;
+import killercreepr.cruxconfig.config.bukkit.loader.KeyLootTableLoader;
 import killercreepr.cruxconfig.config.bukkit.loader.LootTableLoader;
 import killercreepr.cruxcore.command.CruxCoreCommands;
 import killercreepr.cruxcore.listener.ItemStackListener;
@@ -218,6 +219,11 @@ public class CruxCore extends CruxPlugin implements Listener {
         super.reload();
         loadTags();
         //CRUX_CONFIGS.reload(this);
+
+        new KeyLootTableLoader().loadConfiguration(
+            new CruxFolder(this, "key_loot_tables").file()
+        );
+
         MODULES.reload(this);
         CruxRegistries.PLUGINS.forEach(plugin ->{
             if(plugin instanceof CruxCore) return;
