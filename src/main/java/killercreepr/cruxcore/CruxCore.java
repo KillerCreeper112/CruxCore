@@ -2,23 +2,24 @@ package killercreepr.cruxcore;
 
 import killercreepr.crux.Crux;
 import killercreepr.crux.CruxMainModule;
+import killercreepr.crux.persistence.CruxPersistence;
 import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.crux.registries.CruxModuleRegistry;
 import killercreepr.crux.registries.CruxRegistries;
 import killercreepr.crux.util.CruxString;
+import killercreepr.crux.util.CruxTag;
 import killercreepr.cruxadvancements.CruxAdvancementsModule;
 import killercreepr.cruxattributes.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
+import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
 import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
-import killercreepr.cruxconfig.config.bukkit.loader.BlockSoundGroupLoader;
-import killercreepr.cruxconfig.config.bukkit.loader.ItemTagLoader;
-import killercreepr.cruxconfig.config.bukkit.loader.KeyLootTableLoader;
-import killercreepr.cruxconfig.config.bukkit.loader.LootTableLoader;
+import killercreepr.cruxconfig.config.bukkit.loader.*;
 import killercreepr.cruxcore.command.CruxCoreCommands;
 import killercreepr.cruxcore.listener.ItemStackListener;
 import killercreepr.cruxcore.listener.PlayerDataListener;
+import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
 import killercreepr.cruxenchants.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
 import killercreepr.cruxexternal.CruxExternalModule;
@@ -36,13 +37,17 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class CruxCore extends CruxPlugin implements Listener {
     private static CruxCore instance;
@@ -122,6 +127,18 @@ public class CruxCore extends CruxPlugin implements Listener {
             Component.text(CruxString.latinFont(event.getMessage()))
                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, CruxString.latinFont(event.getMessage())))
         );
+
+        ItemStack item = CruxTag.set(new ItemStack(Material.GRASS_BLOCK),"test", CruxPersistence.LIST.LOCATION, List.of(
+            new Location(null, 0D, 0D, 0D),
+            new Location(null, 1D, 2D, 3D),
+            new Location(null, 4D, 5D, 6D),
+            new Location(null, 7D, 8D, 100D)
+        ));
+        event.getPlayer().getInventory().addItem(item);
+
+        CruxTag.get(item, "test", CruxPersistence.LIST.LOCATION).forEach(l ->{
+            Bukkit.broadcastMessage(l + "");
+        });
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -131,6 +148,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             "[CruxCore] Structure " + event.getStructure().key() + " spawned at " + l.getBlockX() + ", " + l.getBlockY() + ", " + l.getBlockZ()
         ).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/teleport " + l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ())));
     }
+
 
     protected final StructureManager structureManager = new StructureManager(this);
 
@@ -206,6 +224,9 @@ public class CruxCore extends CruxPlugin implements Listener {
         new ItemTagLoader().loadConfiguration(
             new CruxFolder(this, "tags/item").file()
         );
+        new BlockTagLoader().loadConfiguration(
+            new CruxFolder(this, "tags/block").file()
+        );
     }
 
     public void loadBlockSoundGroups(){
@@ -240,6 +261,10 @@ public class CruxCore extends CruxPlugin implements Listener {
 
         CruxCore.inst().cruxMenus().menuRegistry().loadConfiguration(
             new CruxFolder(this, "menus").file()
+        );
+
+        new CraftingRecipeLoader().load(
+            new CruxConfig(this, "crafting_recipes"), getServer()
         );
     }
 
