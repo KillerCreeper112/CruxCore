@@ -1,6 +1,7 @@
 package killercreepr.cruxcore.command;
 
 import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -9,7 +10,10 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.crux.util.CruxMath;
+import killercreepr.crux.util.CruxString;
 import killercreepr.cruxcore.CruxCore;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +37,7 @@ public class CruxCoreCommands {
             commands.register(cmd, List.of("ccore"));
             commands.register(
                 Commands.literal("flightspeed")
+                    .requires(source -> source.getSender().hasPermission("cruxcore.cmds.flightspeed.use"))
                     .then(
                         Commands.argument("value", DoubleArgumentType.doubleArg())
                             .executes(ctx ->{
@@ -59,6 +64,19 @@ public class CruxCoreCommands {
                     plugin.reload();
                     return 1;
                 })
+        ).then(
+            Commands.literal("latinfont")
+                .then(
+                    Commands.argument("text", StringArgumentType.greedyString())
+                        .executes(ctx ->{
+                            String text = ctx.getArgument("text", String.class);
+                            getExecutor(ctx.getSource()).sendMessage(
+                                Component.text(CruxString.latinFont(text))
+                                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, CruxString.latinFont(text)))
+                            );
+                            return 1;
+                        })
+                )
         )
         ;
         return dispatcher.build();

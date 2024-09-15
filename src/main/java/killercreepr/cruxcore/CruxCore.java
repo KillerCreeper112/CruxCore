@@ -2,12 +2,9 @@ package killercreepr.cruxcore;
 
 import killercreepr.crux.Crux;
 import killercreepr.crux.CruxMainModule;
-import killercreepr.crux.persistence.CruxPersistence;
 import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.crux.registries.CruxModuleRegistry;
 import killercreepr.crux.registries.CruxRegistries;
-import killercreepr.crux.util.CruxString;
-import killercreepr.crux.util.CruxTag;
 import killercreepr.cruxadvancements.CruxAdvancementsModule;
 import killercreepr.cruxattributes.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
@@ -37,17 +34,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class CruxCore extends CruxPlugin implements Listener {
     private static CruxCore instance;
@@ -121,26 +112,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         return CRUX_GENERATION;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        Bukkit.broadcast(
-            Component.text(CruxString.latinFont(event.getMessage()))
-                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, CruxString.latinFont(event.getMessage())))
-        );
-
-        ItemStack item = CruxTag.set(new ItemStack(Material.GRASS_BLOCK),"test", CruxPersistence.LIST.LOCATION, List.of(
-            new Location(null, 0D, 0D, 0D),
-            new Location(null, 1D, 2D, 3D),
-            new Location(null, 4D, 5D, 6D),
-            new Location(null, 7D, 8D, 100D)
-        ));
-        event.getPlayer().getInventory().addItem(item);
-
-        CruxTag.get(item, "test", CruxPersistence.LIST.LOCATION).forEach(l ->{
-            Bukkit.broadcastMessage(l + "");
-        });
-    }
-
     @EventHandler(ignoreCancelled = true)
     public void onStructurePlace(StructurePlaceEvent event) {
         Location l = event.getLocation();
@@ -148,7 +119,6 @@ public class CruxCore extends CruxPlugin implements Listener {
             "[CruxCore] Structure " + event.getStructure().key() + " spawned at " + l.getBlockX() + ", " + l.getBlockY() + ", " + l.getBlockZ()
         ).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/teleport " + l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ())));
     }
-
 
     protected final StructureManager structureManager = new StructureManager(this);
 
