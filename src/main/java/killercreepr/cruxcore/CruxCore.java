@@ -1,5 +1,6 @@
 package killercreepr.cruxcore;
 
+import com.google.common.reflect.TypeToken;
 import killercreepr.crux.Crux;
 import killercreepr.crux.CruxMainModule;
 import killercreepr.crux.plugin.CruxPlugin;
@@ -9,11 +10,18 @@ import killercreepr.cruxadvancements.CruxAdvancementsModule;
 import killercreepr.cruxattributes.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
+import killercreepr.cruxconfig.config.bukkit.file.BukkitDataFile;
 import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
 import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
 import killercreepr.cruxconfig.config.bukkit.loader.*;
+import killercreepr.cruxconfig.config.common.file.DataFile;
+import killercreepr.cruxconfig.config.registry.CfgRegistries;
 import killercreepr.cruxcore.command.CruxCoreCommands;
+import killercreepr.cruxcore.config.handler.FileDynamicItemUpdater;
+import killercreepr.cruxcore.config.handler.FileDynamicUpdater;
+import killercreepr.cruxcore.item.updater.DynamicItemUpdater;
+import killercreepr.cruxcore.item.updater.DynamicUpdater;
 import killercreepr.cruxcore.listener.ItemStackListener;
 import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
@@ -22,6 +30,7 @@ import killercreepr.cruxentities.CruxEntitiesModule;
 import killercreepr.cruxexternal.CruxExternalModule;
 import killercreepr.cruxgeneration.CruxGenerationModule;
 import killercreepr.cruxitems.CruxItemsModule;
+import killercreepr.cruxitems.registries.CruxItemRegistries;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
 import killercreepr.cruxstructures.CruxStructuresModule;
@@ -39,6 +48,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 public class CruxCore extends CruxPlugin implements Listener {
     private static CruxCore instance;
@@ -161,6 +172,11 @@ public class CruxCore extends CruxPlugin implements Listener {
         ).load(this);
 
         super.onLoad();
+
+        CfgRegistries.SIMPLE_REGISTRY.forEach(reg ->{
+            reg.registerFileHandler(DynamicUpdater.class, new FileDynamicUpdater());
+            reg.registerFileHandler(DynamicItemUpdater.class, new FileDynamicItemUpdater());
+        });
     }
 
     @Override
@@ -216,7 +232,7 @@ public class CruxCore extends CruxPlugin implements Listener {
         );
 
         MODULES.reload(this);
-        CruxRegistries.PLUGINS.forEach(plugin ->{
+        CruxRegistries.PLUGIN.forEach(plugin ->{
             if(plugin instanceof CruxCore) return;
             plugin.reload(this);
         });
@@ -236,7 +252,26 @@ public class CruxCore extends CruxPlugin implements Listener {
         new CraftingRecipeLoader().load(
             new CruxConfig(this, "crafting_recipes"), getServer()
         );
+
+        if(parsedItemUpdaters != null){
+            parsedItemUpdaters.forEach(parsed ->{
+                CruxItemRegistries.ITEM_UPDATERS.remove(parsed.key());
+            });
+        }
+        DataFile dataFile = BukkitDataFile.parseFromGeneralPath(getDataFolder().getAbsolutePath(), "item_updaters");
+        if(dataFile != null){
+            parsedItemUpdaters = dataFile.deserialize("values", new TypeToken<Collection<DynamicItemUpdater>>(){}.getType());
+        }else parsedItemUpdaters = null;
+
+        if(parsedItemUpdaters != null){
+            parsedItemUpdaters.forEach(parsed ->{
+                CruxItemRegistries.ITEM_UPDATERS.register(parsed.getPriority(), parsed);
+                log("Registered item updater: " + parsed.key() + " with priority, " + parsed.getPriority());
+            });
+        }
     }
+
+    protected Collection<DynamicItemUpdater> parsedItemUpdaters;
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
