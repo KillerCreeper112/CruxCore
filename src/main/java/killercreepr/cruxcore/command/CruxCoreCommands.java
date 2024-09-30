@@ -8,12 +8,15 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import killercreepr.crux.command.argument.CruxCmdArguments;
+import killercreepr.crux.module.CruxModule;
 import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.crux.util.CruxMath;
 import killercreepr.crux.util.CruxString;
 import killercreepr.cruxcore.CruxCore;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +67,29 @@ public class CruxCoreCommands {
                     plugin.reload();
                     return 1;
                 })
+                .then(
+                    Commands.argument("plugin", CruxCmdArguments.CRUX_PLUGIN)
+                        .executes(ctx ->{
+                            CruxPlugin cruxPlugin = ctx.getArgument("plugin", CruxPlugin.class);
+                            getExecutor(ctx.getSource()).sendMessage("Reloading CruxPlugin: " + cruxPlugin.getName());
+                            cruxPlugin.reload(plugin);
+                            return 1;
+                        })
+                )
+        ).then(
+            Commands.literal("module")
+                .then(
+                    Commands.literal("reload")
+                        .then(
+                            Commands.argument("module", CruxCmdArguments.CRUX_MODULE)
+                                .executes(ctx ->{
+                                    CruxModule module = ctx.getArgument("module", CruxModule.class);
+                                    getExecutor(ctx.getSource()).sendMessage("Reloading CruxModule: " + module.name());
+                                    module.reload(plugin);
+                                    return 1;
+                                })
+                        )
+                )
         ).then(
             Commands.literal("latinfont")
                 .then(
@@ -73,6 +99,7 @@ public class CruxCoreCommands {
                             getExecutor(ctx.getSource()).sendMessage(
                                 Component.text(CruxString.latinFont(text))
                                     .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, CruxString.latinFont(text)))
+                                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy")))
                             );
                             return 1;
                         })
