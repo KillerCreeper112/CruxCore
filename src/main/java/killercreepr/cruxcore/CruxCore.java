@@ -34,18 +34,12 @@ import killercreepr.cruxitems.registries.CruxItemRegistries;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
 import killercreepr.cruxstructures.CruxStructuresModule;
-import killercreepr.cruxstructures.event.StructurePlaceEvent;
 import killercreepr.cruxstructures.manager.StructureManager;
 import killercreepr.cruxworlds.CruxWorldsModule;
 import killercreepr.cruxworlds.world.manager.CruxWorldManager;
 import killercreepr.cruxworlds.world.manager.SimpleCruxWorldManager;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
@@ -121,14 +115,6 @@ public class CruxCore extends CruxPlugin implements Listener {
     }
     public CruxGenerationModule cruxGeneration() {
         return CRUX_GENERATION;
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onStructurePlace(StructurePlaceEvent event) {
-        Location l = event.getLocation();
-        Bukkit.broadcast(Component.text(
-            "[CruxCore] Structure " + event.getStructure().key() + " spawned at " + l.getBlockX() + ", " + l.getBlockY() + ", " + l.getBlockZ()
-        ).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/teleport " + l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ())));
     }
 
     protected final StructureManager structureManager = new StructureManager(this);
