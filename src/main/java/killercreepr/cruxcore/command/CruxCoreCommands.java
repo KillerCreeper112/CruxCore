@@ -8,6 +8,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import killercreepr.crux.Crux;
 import killercreepr.crux.command.argument.CruxCmdArguments;
 import killercreepr.crux.module.CruxModule;
 import killercreepr.crux.plugin.CruxPlugin;
@@ -101,6 +102,19 @@ public class CruxCoreCommands {
                                     .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, CruxString.latinFont(text)))
                                     .hoverEvent(HoverEvent.showText(Component.text("Click to copy")))
                             );
+                            return 1;
+                        })
+                )
+        ).then(
+            Commands.literal("evaluate")
+                .then(
+                    Commands.argument("equation", StringArgumentType.greedyString())
+                        .executes(ctx ->{
+                            String equation = ctx.getArgument("equation", String.class);
+                            double output = CruxMath.evaluate(Crux.FORMAT.deserializeString(equation));
+                            getExecutor(ctx.getSource()).sendMessage(Component.text("Output: " + output)
+                                .clickEvent(ClickEvent.copyToClipboard(output + ""))
+                                .hoverEvent(HoverEvent.showText(Component.text("Click to copy"))));
                             return 1;
                         })
                 )
