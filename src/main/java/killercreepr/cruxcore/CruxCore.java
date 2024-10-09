@@ -1,8 +1,11 @@
 package killercreepr.cruxcore;
 
 import com.google.common.reflect.TypeToken;
+import io.papermc.paper.entity.CollarColorable;
 import killercreepr.crux.Crux;
 import killercreepr.crux.CruxMainModule;
+import killercreepr.crux.data.tag.entity.BaseEntityTag;
+import killercreepr.crux.data.tag.entity.EntityTag;
 import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.crux.registries.CruxModuleRegistry;
 import killercreepr.crux.registries.CruxRegistries;
@@ -27,6 +30,9 @@ import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
 import killercreepr.cruxenchants.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
+import killercreepr.cruxentities.entity.CruxMob;
+import killercreepr.cruxentities.entity.MobCategory;
+import killercreepr.cruxentities.registries.CruxEntityRegistries;
 import killercreepr.cruxexternal.CruxExternalModule;
 import killercreepr.cruxgeneration.CruxGenerationModule;
 import killercreepr.cruxitems.CruxItemsModule;
@@ -38,12 +44,16 @@ import killercreepr.cruxstructures.manager.StructureManager;
 import killercreepr.cruxworlds.CruxWorldsModule;
 import killercreepr.cruxworlds.world.manager.CruxWorldManager;
 import killercreepr.cruxworlds.world.manager.SimpleCruxWorldManager;
+import net.kyori.adventure.key.Key;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
+import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.logging.Level;
 
 public class CruxCore extends CruxPlugin implements Listener {
     private static CruxCore instance;
@@ -134,11 +144,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         Crux.setMainPlugin(this);
         BukkitCfgHandlers.initStandard();
 
-        loadTags();
-        loadBlockSoundGroups();
-
-        new CruxCoreCommands(this).register(this);
-
         CRUX_STRUCTURES.registerCommands(this, structureManager);
         MODULES.register(
             CRUX_MAIN,
@@ -156,6 +161,11 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_GENERATION,
             CRUX_WORLDS
         ).load(this);
+
+        loadTags();
+        loadBlockSoundGroups();
+
+        new CruxCoreCommands(this).register(this);
 
         super.onLoad();
 
@@ -193,12 +203,76 @@ public class CruxCore extends CruxPlugin implements Listener {
     }
 
     public void loadTags(){
+        loadBuiltInTags();
         new ItemTagLoader().loadConfiguration(
             new CruxFolder(this, "tags/item").file()
         );
         new BlockTagLoader().loadConfiguration(
             new CruxFolder(this, "tags/block").file()
         );
+        new EntityTagLoader().loadConfiguration(
+            new CruxFolder(this, "tags/entity").file()
+        );
+    }
+
+    public void loadBuiltInTags(){
+        registerEntityTag(new BaseEntityTag(Crux.key("monster")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return entity instanceof Monster;
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("enemy")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return entity instanceof Enemy;
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("animal")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return entity instanceof Animals;
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("colorable")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return entity instanceof Colorable;
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("collar_colorable")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return entity instanceof CollarColorable;
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("boss")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return entity instanceof Boss;
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("crux_mob_custom")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return CruxMob.is(entity);
+            }
+        });
+        for(MobCategory category : CruxEntityRegistries.MOB_CATEGORY){
+            registerEntityTag(
+                new BaseEntityTag(Key.key(category.key().namespace(), "crux_mob_category/" + category.key().value())) {
+                    @Override
+                    public boolean isTagged(@NotNull Entity entity) {
+                        return CruxMob.isInCategory(entity, category);
+                    }
+                }
+            );
+        }
+    }
+
+    private void registerEntityTag(EntityTag tag){
+        CruxRegistries.ENTITY_TAG.register(tag);
+        Crux.log(Level.INFO, "Registered built-in entity tag: " + tag.key());
     }
 
     public void loadBlockSoundGroups(){
