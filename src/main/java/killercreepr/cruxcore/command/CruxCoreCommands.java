@@ -12,12 +12,14 @@ import killercreepr.crux.Crux;
 import killercreepr.crux.command.argument.CruxCmdArguments;
 import killercreepr.crux.module.CruxModule;
 import killercreepr.crux.plugin.CruxPlugin;
+import killercreepr.crux.tags.container.TagContainer;
 import killercreepr.crux.util.CruxMath;
 import killercreepr.crux.util.CruxString;
 import killercreepr.cruxcore.CruxCore;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -114,6 +116,20 @@ public class CruxCoreCommands {
                             double output = CruxMath.evaluate(Crux.FORMAT.deserializeString(equation));
                             getExecutor(ctx.getSource()).sendMessage(Component.text("Output: " + output)
                                 .clickEvent(ClickEvent.copyToClipboard(output + ""))
+                                .hoverEvent(HoverEvent.showText(Component.text("Click to copy"))));
+                            return 1;
+                        })
+                )
+        ).then(
+            Commands.literal("format")
+                .then(
+                    Commands.argument("text", StringArgumentType.greedyString())
+                        .executes(ctx ->{
+                            String text = ctx.getArgument("text", String.class);
+                            Component output = Crux.FORMAT.deserialize(text, TagContainer.merged()
+                                .hook(getExecutor(ctx.getSource())));
+                            getExecutor(ctx.getSource()).sendMessage(Component.text("Output: " + output)
+                                .clickEvent(ClickEvent.copyToClipboard(PlainTextComponentSerializer.plainText().serialize(output)))
                                 .hoverEvent(HoverEvent.showText(Component.text("Click to copy"))));
                             return 1;
                         })

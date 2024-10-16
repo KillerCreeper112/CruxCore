@@ -12,6 +12,7 @@ import killercreepr.crux.registries.CruxRegistries;
 import killercreepr.cruxadvancements.CruxAdvancementsModule;
 import killercreepr.cruxattributes.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
+import killercreepr.cruxblocks.manager.CruxBlockTicker;
 import killercreepr.cruxconfig.CruxConfigsModule;
 import killercreepr.cruxconfig.config.bukkit.file.BukkitDataFile;
 import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
@@ -45,9 +46,13 @@ import killercreepr.cruxworlds.CruxWorldsModule;
 import killercreepr.cruxworlds.world.manager.CruxWorldManager;
 import killercreepr.cruxworlds.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.monster.Monster;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.Boss;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.Listener;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
@@ -67,7 +72,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxAttributesModule CRUX_ATTRIBUTES = new CruxAttributesModule();
     protected final CruxEntitiesModule CRUX_ENTITIES = new CruxEntitiesModule();
     protected final CruxEnchantsModule CRUX_ENCHANTS = new CruxEnchantsModule();
-    protected final CruxBlocksModule CRUX_BLOCKS = new CruxBlocksModule();
+    protected final CruxBlocksModule CRUX_BLOCKS = new CruxBlocksModule(CruxBlockTicker.simple(this));
     protected final CruxStructuresModule CRUX_STRUCTURES = new CruxStructuresModule();
     protected final CruxExternalModule CRUX_EXTERNAL = new CruxExternalModule();
     protected final CruxAdvancementsModule CRUX_ADVANCEMENTS = new CruxAdvancementsModule();
@@ -168,7 +173,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         new CruxCoreCommands(this).register(this);
 
         super.onLoad();
-
         CfgRegistries.SIMPLE_REGISTRY.forEach(reg ->{
             reg.registerFileHandler(DynamicUpdater.class, new FileDynamicUpdater());
             reg.registerFileHandler(DynamicItemUpdater.class, new FileDynamicItemUpdater());
@@ -181,8 +185,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         //they will automatically add in their listeners
         MODULES.enable(this);
         CRUX_ITEMS.registerGeneralDisplayFormatter();
-
-        CRUX_BLOCKS.buildBlockTickTask(getServer()).runTaskTimerAsynchronously(this, 20L, 1L);
 
         reload();
         registerListeners(
