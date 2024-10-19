@@ -43,6 +43,7 @@ import killercreepr.cruxpotions.CruxPotionsModule;
 import killercreepr.cruxstructures.CruxStructuresModule;
 import killercreepr.cruxstructures.manager.StructureManager;
 import killercreepr.cruxworlds.CruxWorldsModule;
+import killercreepr.cruxworlds.config.loader.NaturalEntityGroupGroupCfgLoader;
 import killercreepr.cruxworlds.world.manager.CruxWorldManager;
 import killercreepr.cruxworlds.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
@@ -293,6 +294,12 @@ public class CruxCore extends CruxPlugin implements Listener {
             new CruxFolder(this, "key_loot_tables").file()
         );
 
+        loadBlockSoundGroups();
+
+        new NaturalEntityGroupGroupCfgLoader().loadConfiguration(
+            new CruxFolder(this, "entity_spawn_groups").file()
+        );
+
         MODULES.reload(this);
         CruxRegistries.PLUGIN.forEach(plugin ->{
             if(plugin instanceof CruxCore) return;
@@ -302,8 +309,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         new LootTableLoader().loadConfiguration(
             new CruxFolder(this, "loot_tables").file()
         );
-
-        loadBlockSoundGroups();
 
         structureManager.loadConfiguration();
 
