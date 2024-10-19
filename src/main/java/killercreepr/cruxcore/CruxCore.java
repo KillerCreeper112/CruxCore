@@ -22,6 +22,7 @@ import killercreepr.cruxconfig.config.bukkit.loader.*;
 import killercreepr.cruxconfig.config.common.file.DataFile;
 import killercreepr.cruxconfig.config.registry.CfgRegistries;
 import killercreepr.cruxcore.command.CruxCoreCommands;
+import killercreepr.cruxcore.command.FAWECommands;
 import killercreepr.cruxcore.config.handler.FileDynamicItemUpdater;
 import killercreepr.cruxcore.config.handler.FileDynamicUpdater;
 import killercreepr.cruxcore.item.updater.DynamicItemUpdater;
@@ -172,6 +173,7 @@ public class CruxCore extends CruxPlugin implements Listener {
         loadBlockSoundGroups();
 
         new CruxCoreCommands(this).register(this);
+        new FAWECommands(this).register(this);
 
         super.onLoad();
         CfgRegistries.SIMPLE_REGISTRY.forEach(reg ->{

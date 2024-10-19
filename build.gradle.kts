@@ -35,9 +35,9 @@ dependencies {
         "E:\\Plugins\\Crux2.0\\crux\\CruxWorlds\\build\\libs\\CruxWorlds-1.0.jar",
     ))
 
-    /*compileOnly(fileTree("libs") {
+    compileOnly(fileTree("libs") {
         include("*.jar")
-    })*/
+    })
 }
 tasks{
     runServer{
