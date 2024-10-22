@@ -10,6 +10,9 @@ dependencies:
       load: BEFORE
       required: false # Defaults to true
       join-classpath: true # Defaults to true
+    WorldEdit:
+      load: BEFORE
+      required: false
     HeadDatabase:
       load: BEFORE
       required: false
