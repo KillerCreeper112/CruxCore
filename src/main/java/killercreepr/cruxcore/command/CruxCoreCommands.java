@@ -128,7 +128,7 @@ public class CruxCoreCommands {
                             String text = ctx.getArgument("text", String.class);
                             Component output = Crux.FORMAT.deserialize(text, TagContainer.merged()
                                 .hook(getExecutor(ctx.getSource())));
-                            getExecutor(ctx.getSource()).sendMessage(Component.text("Output: " + output)
+                            getExecutor(ctx.getSource()).sendMessage(Component.text("Output: ").append(output)
                                 .clickEvent(ClickEvent.copyToClipboard(PlainTextComponentSerializer.plainText().serialize(output)))
                                 .hoverEvent(HoverEvent.showText(Component.text("Click to copy"))));
                             return 1;
