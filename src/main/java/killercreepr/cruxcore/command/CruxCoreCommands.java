@@ -6,6 +6,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.Crux;
@@ -24,6 +26,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +43,7 @@ public class CruxCoreCommands {
             LiteralCommandNode<CommandSourceStack> cmd = build(Commands.literal("cruxcore")
                 .requires(source -> source.getSender().hasPermission("cruxcore.cmds.cruxcore.use")),
                 plugin.getLifecycleManager());
-            commands.register(cmd, List.of("ccore"));
+            commands.register(cmd, List.of("ccore", "cc"));
             commands.register(
                 Commands.literal("flightspeed")
                     .requires(source -> source.getSender().hasPermission("cruxcore.cmds.flightspeed.use"))
@@ -133,6 +136,35 @@ public class CruxCoreCommands {
                                 .hoverEvent(HoverEvent.showText(Component.text("Click to copy"))));
                             return 1;
                         })
+                )
+        ).then(
+            Commands.literal("msg")
+                .then(
+                    Commands.argument("targets", ArgumentTypes.players())
+                        .then(
+                            Commands.argument("text", StringArgumentType.greedyString())
+                                .executes(ctx ->{
+                                    Collection<Player> targets = ctx.getArgument("targets", PlayerSelectorArgumentResolver.class)
+                                        .resolve(ctx.getSource());
+                                    String text = ctx.getArgument("text", String.class);
+
+                                    for(Player p : targets){
+                                        Component output = Crux.FORMAT.deserialize(text, TagContainer.merged()
+                                            .hook(getExecutor(ctx.getSource()))
+                                            .hook(p));
+                                        p.sendMessage(output);
+                                    }
+                                    Component output = Crux.FORMAT.deserialize(text, TagContainer.merged()
+                                        .hook(getExecutor(ctx.getSource())));
+
+                                    getExecutor(ctx.getSource()).sendMessage(
+                                        Component.text("Sent message to " + targets.size() + " players: ")
+                                            .append(output)
+                                    );
+
+                                    return 1;
+                                })
+                        )
                 )
         )
         ;
