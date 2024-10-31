@@ -4,6 +4,10 @@ import com.google.common.reflect.TypeToken;
 import io.papermc.paper.entity.CollarColorable;
 import killercreepr.crux.Crux;
 import killercreepr.crux.CruxMainModule;
+import killercreepr.crux.block.CruxedBlock;
+import killercreepr.crux.block.predicate.BlockPredicate;
+import killercreepr.crux.data.tag.block.BaseBlockTag;
+import killercreepr.crux.data.tag.block.BlockTag;
 import killercreepr.crux.data.tag.entity.BaseEntityTag;
 import killercreepr.crux.data.tag.entity.EntityTag;
 import killercreepr.crux.plugin.CruxPlugin;
@@ -273,11 +277,52 @@ public class CruxCore extends CruxPlugin implements Listener {
                 }
             );
         }
+        registerBlockTag(new BaseBlockTag(Crux.key("empty")) {
+            @Override
+            public boolean isTagged(@NotNull CruxedBlock block) {
+                return block.getBlock().isEmpty();
+            }
+        });
+        registerBlockTag(new BaseBlockTag(Crux.key("replaceable")) {
+            @Override
+            public boolean isTagged(@NotNull CruxedBlock block) {
+                return block.getBlock().isReplaceable();
+            }
+        });
+        registerBlockTag(new BaseBlockTag(Crux.key("solid")) {
+            @Override
+            public boolean isTagged(@NotNull CruxedBlock block) {
+                return block.getBlock().isSolid();
+            }
+        });
+        registerBlockTag(new BaseBlockTag(Crux.key("liquid")) {
+            @Override
+            public boolean isTagged(@NotNull CruxedBlock block) {
+                return block.getBlock().isLiquid();
+            }
+        });
+        registerBlockTag(new BaseBlockTag(Crux.key("collidable")) {
+            @Override
+            public boolean isTagged(@NotNull CruxedBlock block) {
+                return block.getBlock().isCollidable();
+            }
+        });
+        registerBlockTag(new BaseBlockTag(Crux.key("burnable")) {
+            @Override
+            public boolean isTagged(@NotNull CruxedBlock block) {
+                return block.getBlock().isBurnable();
+            }
+        });
     }
 
     private void registerEntityTag(EntityTag tag){
         CruxRegistries.ENTITY_TAG.register(tag);
         Crux.log(Level.INFO, "Registered built-in entity tag: " + tag.key());
+    }
+
+    private void registerBlockTag(BlockTag tag){
+        CruxRegistries.BLOCK_TAG.register(tag);
+        Crux.log(Level.INFO, "Registered built-in block tag: " + tag.key());
     }
 
     public void loadBlockSoundGroups(){
