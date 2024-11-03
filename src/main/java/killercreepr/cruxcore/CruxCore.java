@@ -5,7 +5,6 @@ import io.papermc.paper.entity.CollarColorable;
 import killercreepr.crux.Crux;
 import killercreepr.crux.CruxMainModule;
 import killercreepr.crux.block.CruxedBlock;
-import killercreepr.crux.block.predicate.BlockPredicate;
 import killercreepr.crux.data.tag.block.BaseBlockTag;
 import killercreepr.crux.data.tag.block.BlockTag;
 import killercreepr.crux.data.tag.entity.BaseEntityTag;
@@ -384,6 +383,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             });
         }
     }
+
 
     protected Collection<DynamicItemUpdater> parsedItemUpdaters;
 
