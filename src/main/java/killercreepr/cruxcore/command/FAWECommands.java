@@ -5,14 +5,20 @@ import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.command.ClipboardCommands;
+import com.sk89q.worldedit.command.SchematicCommands;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.function.pattern.ClipboardPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -24,6 +30,7 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.cruxcore.CruxCore;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -71,12 +78,20 @@ public class FAWECommands {
                     World world = BukkitAdapter.adapt(p.getWorld());
                     BlockVector3 placement = BukkitAdapter.asBlockVector(p.getLocation());
                     clipboard.paste(world, placement);
-
-                    BlockVector3 pos1 = placement.add(
-                        clipboard.getWidth()/2, 0, clipboard.getLength()/2
+                    BlockVector3 center = clipboard.getRegion().getCenter().toBlockPoint();
+                    BlockVector3 difference = placement.subtract(clipboard.getOrigin());
+                    BlockVector3 result = center.add(
+                        difference
                     );
-                    BlockVector3 pos2 = placement.add(
-                        (clipboard.getWidth()/2) * -1, clipboard.getHeight(), (clipboard.getLength()/2) * -1
+
+                    boolean even = clipboard.getHeight() % 2 == 0;
+                    int heightMin = even ? Math.min((clipboard.getHeight()/2) - 1, 0) : clipboard.getHeight()/2;
+
+                    BlockVector3 pos1 = result.add(
+                        clipboard.getWidth()/2, clipboard.getHeight()/2, clipboard.getLength()/2
+                    );
+                    BlockVector3 pos2 = result.add(
+                        (clipboard.getWidth()/2) * -1, (heightMin) * -1, (clipboard.getLength()/2) * -1
                     );
                     session.getRegionSelector(world).selectPrimary(pos1, ActorSelectorLimits.forActor(actor));
                     session.getRegionSelector(world).selectSecondary(pos2, ActorSelectorLimits.forActor(actor));
@@ -97,10 +112,12 @@ public class FAWECommands {
                                 sender.sendMessage("Session not present.");
                                 return 0;
                             }
+
                             World world = BukkitAdapter.adapt(p.getWorld());
                             try(Clipboard clipboard = ReadOnlyClipboard.of(
                                 WorldEdit.getInstance().newEditSession(world),
-                                new CuboidRegion(session.getRegionSelector(world).getVertices().get(0),session.getRegionSelector(world).getVertices().get(1))
+                                new CuboidRegion(session.getRegionSelector(world).getVertices().get(0),
+                                    session.getRegionSelector(world).getVertices().get(1))
                             )){
                                 Region region = clipboard.getRegion();
                                 if(!(region instanceof CuboidRegion cuboid)){
@@ -110,7 +127,8 @@ public class FAWECommands {
                                 BlockVector3 origin = getCenterPoint(cuboid.getPos1(), cuboid.getPos2());
                                 int y = Math.min(cuboid.getPos1().y(), cuboid.getPos2().y());
                                 origin = origin.withY(y);
-                                WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> clipboard, region);
+                                Clipboard faweClipboard = clipboard;
+                                //WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> clipboard, region);
                                 faweClipboard.setOrigin(origin);
 
                                 File f = WorldEdit.getInstance().getSchematicsFolderPath().resolve( name + ".schem").toFile();
