@@ -1,7 +1,5 @@
 package killercreepr.cruxcore.command;
 
-import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
-import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -9,19 +7,16 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.command.ClipboardCommands;
-import com.sk89q.worldedit.command.SchematicCommands;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
-import com.sk89q.worldedit.function.pattern.ClipboardPattern;
-import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -30,7 +25,6 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.cruxcore.CruxCore;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -114,27 +108,23 @@ public class FAWECommands {
                             }
 
                             World world = BukkitAdapter.adapt(p.getWorld());
-                            try(Clipboard clipboard = ReadOnlyClipboard.of(
-                                WorldEdit.getInstance().newEditSession(world),
-                                new CuboidRegion(session.getRegionSelector(world).getVertices().get(0),
-                                    session.getRegionSelector(world).getVertices().get(1))
-                            )){
-                                Region region = clipboard.getRegion();
-                                if(!(region instanceof CuboidRegion cuboid)){
-                                    sender.sendMessage("Region not a cuboid.");
-                                    return 0;
-                                }
-                                BlockVector3 origin = getCenterPoint(cuboid.getPos1(), cuboid.getPos2());
-                                int y = Math.min(cuboid.getPos1().y(), cuboid.getPos2().y());
+                            CuboidRegion region = new CuboidRegion(session.getRegionSelector(world).getVertices().get(0),
+                                session.getRegionSelector(world).getVertices().get(1));
+                            try(Clipboard clipboard = new BlockArrayClipboard(region)){
+                                EditSession editSession = WorldEdit.getInstance().newEditSession(world);
+                                ForwardExtentCopy copy = new ForwardExtentCopy(
+                                    editSession, region, clipboard, region.getMinimumPoint()
+                                );
+                                BlockVector3 origin = getCenterPoint(region.getPos1(), region.getPos2());
+                                int y = Math.min(region.getPos1().y(), region.getPos2().y());
                                 origin = origin.withY(y);
-                                Clipboard faweClipboard = clipboard;
-                                //WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> clipboard, region);
-                                faweClipboard.setOrigin(origin);
+                                clipboard.setOrigin(origin);
+                                Operations.complete(copy);
 
                                 File f = WorldEdit.getInstance().getSchematicsFolderPath().resolve( name + ".schem").toFile();
                                 try(ClipboardWriter writer = BuiltInClipboardFormat.FAST.getWriter(new FileOutputStream(f))) {
                                     writer.writeRotation(BukkitAdapter.adapt(p.getEyeLocation()));
-                                    writer.write(faweClipboard);
+                                    writer.write(clipboard);
                                     sender.sendMessage("Saved schematic to " + f.getAbsolutePath());
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);

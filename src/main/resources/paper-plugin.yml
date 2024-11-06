@@ -23,3 +23,6 @@ dependencies:
     ModelEngine:
       load: BEFORE
       required: false
+    zAuctionHouseV3:
+      load: BEFORE
+      required: false
