@@ -116,7 +116,7 @@ public class CruxCoreCommands {
                     Commands.argument("equation", StringArgumentType.greedyString())
                         .executes(ctx ->{
                             String equation = ctx.getArgument("equation", String.class);
-                            double output = CruxMath.evaluate(Crux.FORMAT.deserializeString(equation));
+                            double output = CruxMath.evaluate(Crux.format().deserializeString(equation));
                             getExecutor(ctx.getSource()).sendMessage(Component.text("Output: " + output)
                                 .clickEvent(ClickEvent.copyToClipboard(output + ""))
                                 .hoverEvent(HoverEvent.showText(Component.text("Click to copy"))));
@@ -129,11 +129,23 @@ public class CruxCoreCommands {
                     Commands.argument("text", StringArgumentType.greedyString())
                         .executes(ctx ->{
                             String text = ctx.getArgument("text", String.class);
-                            Component output = Crux.FORMAT.deserialize(text, TagContainer.merged()
+                            Component output = Crux.format().deserialize(text, TagContainer.merged()
                                 .hook(getExecutor(ctx.getSource())));
                             getExecutor(ctx.getSource()).sendMessage(Component.text("Output: ").append(output)
                                 .clickEvent(ClickEvent.copyToClipboard(PlainTextComponentSerializer.plainText().serialize(output)))
                                 .hoverEvent(HoverEvent.showText(Component.text("Click to copy"))));
+                            return 1;
+                        })
+                )
+        ).then(
+            Commands.literal("actionbar")
+                .then(
+                    Commands.argument("text", StringArgumentType.greedyString())
+                        .executes(ctx ->{
+                            String text = ctx.getArgument("text", String.class);
+                            Component output = Crux.format().deserialize(text, TagContainer.merged()
+                                .hook(getExecutor(ctx.getSource())));
+                            getExecutor(ctx.getSource()).sendActionBar(output);
                             return 1;
                         })
                 )
@@ -149,12 +161,12 @@ public class CruxCoreCommands {
                                     String text = ctx.getArgument("text", String.class);
 
                                     for(Player p : targets){
-                                        Component output = Crux.FORMAT.deserialize(text, TagContainer.merged()
+                                        Component output = Crux.format().deserialize(text, TagContainer.merged()
                                             .hook(getExecutor(ctx.getSource()))
                                             .hook(p));
                                         p.sendMessage(output);
                                     }
-                                    Component output = Crux.FORMAT.deserialize(text, TagContainer.merged()
+                                    Component output = Crux.format().deserialize(text, TagContainer.merged()
                                         .hook(getExecutor(ctx.getSource())));
 
                                     getExecutor(ctx.getSource()).sendMessage(
