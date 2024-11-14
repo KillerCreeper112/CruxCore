@@ -5,6 +5,8 @@ import io.papermc.paper.entity.CollarColorable;
 import killercreepr.crux.Crux;
 import killercreepr.crux.CruxMainModule;
 import killercreepr.crux.block.CruxedBlock;
+import killercreepr.crux.data.entity.EntityMemory;
+import killercreepr.crux.data.entity.PlayerMemory;
 import killercreepr.crux.data.tag.block.BaseBlockTag;
 import killercreepr.crux.data.tag.block.BlockTag;
 import killercreepr.crux.data.tag.entity.BaseEntityTag;
@@ -13,7 +15,7 @@ import killercreepr.crux.plugin.CruxPlugin;
 import killercreepr.crux.registries.CruxModuleRegistry;
 import killercreepr.crux.registries.CruxRegistries;
 import killercreepr.cruxadvancements.CruxAdvancementsModule;
-import killercreepr.cruxattributes.CruxAttributesModule;
+import killercreepr.cruxattributes.core.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
 import killercreepr.cruxblocks.manager.CruxBlockTicker;
 import killercreepr.cruxconfig.CruxConfigsModule;
@@ -44,6 +46,8 @@ import killercreepr.cruxitems.CruxItemsModule;
 import killercreepr.cruxitems.registries.CruxItemRegistries;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
+import killercreepr.cruxstats.core.CruxStatsModule;
+import killercreepr.cruxstats.core.stat.PlayerCruxStatHolder;
 import killercreepr.cruxstructures.CruxStructuresModule;
 import killercreepr.cruxstructures.manager.StructureManager;
 import killercreepr.cruxworlds.CruxWorldsModule;
@@ -75,6 +79,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxConfigsModule CRUX_CONFIGS = new CruxConfigsModule();
     protected final CruxPotionsModule CRUX_POTIONS = new CruxPotionsModule();
     protected final CruxAttributesModule CRUX_ATTRIBUTES = new CruxAttributesModule();
+    protected final CruxStatsModule CRUX_STATS = new CruxStatsModule();
     protected final CruxEntitiesModule CRUX_ENTITIES = new CruxEntitiesModule();
     protected final CruxEnchantsModule CRUX_ENCHANTS = new CruxEnchantsModule();
     protected final CruxBlocksModule CRUX_BLOCKS = new CruxBlocksModule(CruxBlockTicker.simple(this));
@@ -125,6 +130,9 @@ public class CruxCore extends CruxPlugin implements Listener {
     public CruxAttributesModule cruxAttributes() {
         return CRUX_ATTRIBUTES;
     }
+    public CruxStatsModule cruxStats() {
+        return CRUX_STATS;
+    }
 
     public CruxEntitiesModule cruxEntities() {
         return CRUX_ENTITIES;
@@ -162,6 +170,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_MENUS,
             CRUX_POTIONS,
             CRUX_ATTRIBUTES,
+            CRUX_STATS,
             CRUX_ENTITIES,
             CRUX_ENCHANTS,
             CRUX_BLOCKS,
@@ -182,6 +191,11 @@ public class CruxCore extends CruxPlugin implements Listener {
         CfgRegistries.SIMPLE_REGISTRY.forEach(reg ->{
             reg.registerFileHandler(DynamicUpdater.class, new FileDynamicUpdater());
             reg.registerFileHandler(DynamicItemUpdater.class, new FileDynamicItemUpdater());
+        });
+
+        EntityMemory.registerFunction(this, (m) ->{
+            if(!(m instanceof PlayerMemory mem)) return;
+            mem.getDataHolders().register(new PlayerCruxStatHolder(mem));
         });
     }
 
