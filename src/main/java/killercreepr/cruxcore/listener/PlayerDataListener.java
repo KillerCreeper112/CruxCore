@@ -1,6 +1,6 @@
 package killercreepr.cruxcore.listener;
 
-import killercreepr.crux.data.entity.PlayerMemory;
+import killercreepr.crux.api.entity.memory.PlayerMemory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

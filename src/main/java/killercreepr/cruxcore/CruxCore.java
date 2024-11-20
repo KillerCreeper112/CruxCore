@@ -2,18 +2,18 @@ package killercreepr.cruxcore;
 
 import com.google.common.reflect.TypeToken;
 import io.papermc.paper.entity.CollarColorable;
-import killercreepr.crux.Crux;
-import killercreepr.crux.CruxMainModule;
-import killercreepr.crux.block.CruxedBlock;
-import killercreepr.crux.data.entity.EntityMemory;
-import killercreepr.crux.data.entity.PlayerMemory;
-import killercreepr.crux.data.tag.block.BaseBlockTag;
-import killercreepr.crux.data.tag.block.BlockTag;
-import killercreepr.crux.data.tag.entity.BaseEntityTag;
-import killercreepr.crux.data.tag.entity.EntityTag;
-import killercreepr.crux.plugin.CruxPlugin;
-import killercreepr.crux.registries.CruxModuleRegistry;
-import killercreepr.crux.registries.CruxRegistries;
+import killercreepr.crux.api.block.CruxedBlock;
+import killercreepr.crux.api.block.tag.BlockTag;
+import killercreepr.crux.api.entity.memory.EntityMemory;
+import killercreepr.crux.api.entity.memory.PlayerMemory;
+import killercreepr.crux.api.entity.tag.EntityTag;
+import killercreepr.crux.core.Crux;
+import killercreepr.crux.core.block.tag.BaseBlockTag;
+import killercreepr.crux.core.entity.tag.BaseEntityTag;
+import killercreepr.crux.core.plugin.CruxPlugin;
+import killercreepr.crux.core.plugin.module.CruxMainModule;
+import killercreepr.crux.core.registries.CruxModuleRegistry;
+import killercreepr.crux.core.registries.CruxRegistries;
 import killercreepr.cruxadvancements.CruxAdvancementsModule;
 import killercreepr.cruxattributes.core.CruxAttributesModule;
 import killercreepr.cruxblocks.CruxBlocksModule;
@@ -175,7 +175,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_ENCHANTS,
             CRUX_BLOCKS,
             CRUX_STRUCTURES,
-            CRUX_EXTERNAL,
+            //CRUX_EXTERNAL,
             CRUX_ADVANCEMENTS,
             CRUX_GENERATION,
             CRUX_WORLDS

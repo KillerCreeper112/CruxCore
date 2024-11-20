@@ -2,7 +2,7 @@ package killercreepr.cruxcore.listener;
 
 import com.destroystokyo.paper.event.inventory.PrepareResultEvent;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
-import killercreepr.crux.Crux;
+import killercreepr.crux.core.Crux;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

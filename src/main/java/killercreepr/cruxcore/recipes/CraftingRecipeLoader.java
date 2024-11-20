@@ -1,10 +1,10 @@
 package killercreepr.cruxcore.recipes;
 
 import com.google.common.reflect.TypeToken;
-import killercreepr.crux.Crux;
-import killercreepr.crux.context.TextParserContext;
-import killercreepr.crux.item.dynamic.DynamicItem;
-import killercreepr.crux.util.CruxKey;
+import killercreepr.crux.api.item.dynamic.DynamicItem;
+import killercreepr.crux.api.text.context.TextParserContext;
+import killercreepr.crux.core.Crux;
+import killercreepr.crux.core.util.CruxKey;
 import killercreepr.cruxconfig.config.common.element.FileObject;
 import killercreepr.cruxconfig.config.common.file.DataFile;
 import net.kyori.adventure.key.Key;

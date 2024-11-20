@@ -23,7 +23,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import killercreepr.crux.plugin.CruxPlugin;
+import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.cruxcore.CruxCore;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

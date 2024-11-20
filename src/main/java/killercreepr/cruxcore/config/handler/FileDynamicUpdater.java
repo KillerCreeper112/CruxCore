@@ -1,8 +1,8 @@
 package killercreepr.cruxcore.config.handler;
 
-import killercreepr.crux.item.dynamic.DynamicItem;
-import killercreepr.crux.item.predicate.ItemPredicate;
-import killercreepr.crux.util.CruxObjects;
+import killercreepr.crux.api.item.dynamic.DynamicItem;
+import killercreepr.crux.api.item.predicate.ItemPredicate;
+import killercreepr.crux.core.util.CruxObjects;
 import killercreepr.cruxconfig.config.common.FileContext;
 import killercreepr.cruxconfig.config.common.FileRegistry;
 import killercreepr.cruxconfig.config.common.element.FileElement;

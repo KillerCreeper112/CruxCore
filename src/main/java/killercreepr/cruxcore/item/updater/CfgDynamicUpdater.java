@@ -1,9 +1,9 @@
 package killercreepr.cruxcore.item.updater;
 
-import killercreepr.crux.context.TextParserContext;
-import killercreepr.crux.item.dynamic.DynamicItem;
-import killercreepr.crux.item.predicate.ItemPredicate;
-import killercreepr.crux.util.CruxItem;
+import killercreepr.crux.api.item.dynamic.DynamicItem;
+import killercreepr.crux.api.item.predicate.ItemPredicate;
+import killercreepr.crux.api.text.context.TextParserContext;
+import killercreepr.crux.core.util.CruxItem;
 import killercreepr.cruxitems.item.CruxedItemUpdateContext;
 import org.jetbrains.annotations.NotNull;
 
