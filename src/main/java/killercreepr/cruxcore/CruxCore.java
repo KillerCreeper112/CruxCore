@@ -9,15 +9,16 @@ import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.block.tag.BaseBlockTag;
+import killercreepr.crux.core.entity.memory.standard.PlayerBossBarHolder;
 import killercreepr.crux.core.entity.tag.BaseEntityTag;
 import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.plugin.module.CruxMainModule;
 import killercreepr.crux.core.registries.CruxModuleRegistry;
 import killercreepr.crux.core.registries.CruxRegistries;
-import killercreepr.cruxadvancements.CruxAdvancementsModule;
+import killercreepr.cruxadvancements.core.CruxAdvancementsModule;
 import killercreepr.cruxattributes.core.CruxAttributesModule;
-import killercreepr.cruxblocks.CruxBlocksModule;
-import killercreepr.cruxblocks.manager.CruxBlockTicker;
+import killercreepr.cruxblocks.api.block.manager.CruxBlockTicker;
+import killercreepr.cruxblocks.core.CruxBlocksModule;
 import killercreepr.cruxconfig.CruxConfigsModule;
 import killercreepr.cruxconfig.config.bukkit.file.BukkitDataFile;
 import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
@@ -175,7 +176,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_ENCHANTS,
             CRUX_BLOCKS,
             CRUX_STRUCTURES,
-            //CRUX_EXTERNAL,
+            CRUX_EXTERNAL,
             CRUX_ADVANCEMENTS,
             CRUX_GENERATION,
             CRUX_WORLDS
@@ -196,6 +197,7 @@ public class CruxCore extends CruxPlugin implements Listener {
         EntityMemory.registerFunction(this, (m) ->{
             if(!(m instanceof PlayerMemory mem)) return;
             mem.getDataHolders().register(new PlayerCruxStatHolder(mem));
+            mem.getDataHolders().register(new PlayerBossBarHolder(mem));
         });
     }
 
