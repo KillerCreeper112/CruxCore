@@ -354,6 +354,10 @@ public class CruxCore extends CruxPlugin implements Listener {
             new CruxFolder(this, "key_loot_tables").file()
         );
 
+        new NumberLootTableLoader().loadConfiguration(
+            new CruxFolder(this, "number_loot_tables").file()
+        );
+
         loadBlockSoundGroups();
 
         new NaturalEntityGroupGroupCfgLoader().loadConfiguration(

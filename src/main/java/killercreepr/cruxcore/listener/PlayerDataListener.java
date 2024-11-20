@@ -13,4 +13,5 @@ public class PlayerDataListener implements Listener {
         Player p = event.getPlayer();
         PlayerMemory.getOrCreate(p);
     }
+
 }
