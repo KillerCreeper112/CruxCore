@@ -2,8 +2,10 @@ package killercreepr.cruxcore;
 
 import com.google.common.reflect.TypeToken;
 import io.papermc.paper.entity.CollarColorable;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
+import killercreepr.crux.api.component.parser.ComponentParser;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
@@ -56,6 +58,7 @@ import killercreepr.cruxworlds.config.loader.NaturalEntityGroupGroupCfgLoader;
 import killercreepr.cruxworlds.world.manager.CruxWorldManager;
 import killercreepr.cruxworlds.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import org.bukkit.command.Command;
@@ -63,6 +66,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
@@ -218,6 +222,13 @@ public class CruxCore extends CruxPlugin implements Listener {
         );
         structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
     }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onAsyncChat(AsyncChatEvent event) {
+        String input = PlainTextComponentSerializer.plainText().serialize(event.originalMessage());
+        ComponentParser.componentParser().parseComponents(input);
+    }
+
 
     @Override
     public void disabled() {
