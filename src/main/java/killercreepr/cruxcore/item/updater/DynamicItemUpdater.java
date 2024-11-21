@@ -1,7 +1,7 @@
 package killercreepr.cruxcore.item.updater;
 
-import killercreepr.cruxitems.item.CruxedItemUpdateContext;
-import killercreepr.cruxitems.item.CruxedItemUpdater;
+import killercreepr.cruxitems.api.item.CruxedItemUpdater;
+import killercreepr.cruxitems.core.item.CruxedItemUpdateContext;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 

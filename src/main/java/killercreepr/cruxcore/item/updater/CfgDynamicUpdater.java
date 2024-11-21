@@ -4,7 +4,7 @@ import killercreepr.crux.api.item.dynamic.DynamicItem;
 import killercreepr.crux.api.item.predicate.ItemPredicate;
 import killercreepr.crux.api.text.context.TextParserContext;
 import killercreepr.crux.core.util.CruxItem;
-import killercreepr.cruxitems.item.CruxedItemUpdateContext;
+import killercreepr.cruxitems.core.item.CruxedItemUpdateContext;
 import org.jetbrains.annotations.NotNull;
 
 public class CfgDynamicUpdater implements DynamicUpdater{
