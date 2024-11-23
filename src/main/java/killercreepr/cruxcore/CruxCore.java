@@ -5,7 +5,7 @@ import io.papermc.paper.entity.CollarColorable;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
-import killercreepr.crux.api.component.parser.ComponentParser;
+import killercreepr.crux.api.component.parser.DataComponentDecoder;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
@@ -226,7 +226,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onAsyncChat(AsyncChatEvent event) {
         String input = PlainTextComponentSerializer.plainText().serialize(event.originalMessage());
-        ComponentParser.componentParser().parseComponents(input);
+        DataComponentDecoder.componentDecoder().parseComponents(input);
     }
 
 
