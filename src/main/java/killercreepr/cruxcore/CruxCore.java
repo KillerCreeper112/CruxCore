@@ -413,6 +413,7 @@ public class CruxCore extends CruxPlugin implements Listener {
                 log("Registered item updater: " + parsed.key() + " with priority, " + parsed.getPriority());
             });
         }
+        getServer().updateRecipes();
     }
 
 

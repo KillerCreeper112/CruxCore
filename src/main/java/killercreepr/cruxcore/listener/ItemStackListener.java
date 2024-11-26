@@ -6,6 +6,7 @@ import killercreepr.crux.core.Crux;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +18,7 @@ public class ItemStackListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerInventorySlotChange(PlayerInventorySlotChangeEvent event) {
         Player p = event.getPlayer();
         plugin.getServer().getScheduler().runTask(plugin, task ->{
@@ -36,14 +37,14 @@ public class ItemStackListener implements Listener {
         inv.setResult(Crux.handlers().item().update(result));
     }*/
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onItemSpawn(ItemSpawnEvent event) {
         Item entity = event.getEntity();
         ItemStack item = entity.getItemStack();
         entity.setItemStack(Crux.handlers().item().update(item));
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPrepareResult(PrepareResultEvent event) {
         ItemStack result = event.getResult();
         if(result==null) return;
