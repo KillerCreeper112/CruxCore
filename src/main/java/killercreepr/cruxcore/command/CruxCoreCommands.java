@@ -178,6 +178,40 @@ public class CruxCoreCommands {
                                 })
                         )
                 )
+        ).then(
+            Commands.literal("exp")
+                .then(
+                    Commands.literal("points")
+                            .then(
+                                Commands.argument("target", ArgumentTypes.player())
+                                    .then(
+                                        Commands.literal("set")
+                                            .then(
+                                                Commands.argument("points", StringArgumentType.greedyString())
+                                                    .executes(ctx ->{
+                                                        CommandSender sender = getExecutor(ctx.getSource());
+                                                        Player p = ctx.getArgument("target", PlayerSelectorArgumentResolver.class)
+                                                            .resolve(ctx.getSource()).getFirst();
+                                                        double amount = CruxMath.evaluate(Crux.format().deserializeString(ctx.getArgument("points", String.class)));
+                                                        int x = (int) amount;
+                                                        p.setExperienceLevelAndProgress(x);
+                                                        sender.sendMessage("Set experience and level based on points " + p.getName() + ": " + x);
+                                                        return 1;
+                                                    })
+                                            )
+                                    ).then(
+                                        Commands.literal("get")
+                                            .executes(ctx ->{
+                                                CommandSender sender = getExecutor(ctx.getSource());
+                                                Player p = ctx.getArgument("target", PlayerSelectorArgumentResolver.class)
+                                                    .resolve(ctx.getSource()).getFirst();
+                                                int total = p.calculateTotalExperiencePoints();
+                                                sender.sendMessage(p.getName() + " has " + total + " total experience points.");
+                                                return 1;
+                                            })
+                                    )
+                            )
+                )
         )
         ;
         return dispatcher.build();

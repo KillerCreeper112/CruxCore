@@ -1,6 +1,7 @@
 name: CruxCore
 version: '1.0'
 main: killercreepr.cruxcore.CruxCore
+bootstrapper: killercreepr.cruxcore.CruxCoreBootstrapper
 api-version: '1.19'
 description: Thee foundation.
 load: STARTUP

@@ -38,7 +38,7 @@ import killercreepr.cruxcore.item.updater.DynamicUpdater;
 import killercreepr.cruxcore.listener.ItemStackListener;
 import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
-import killercreepr.cruxenchants.CruxEnchantsModule;
+import killercreepr.cruxenchants.core.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
 import killercreepr.cruxentities.entity.CruxMob;
 import killercreepr.cruxentities.entity.MobCategory;
@@ -402,6 +402,7 @@ public class CruxCore extends CruxPlugin implements Listener {
                 CruxItemRegistries.ITEM_UPDATERS.remove(parsed.key());
             });
         }
+
         DataFile dataFile = BukkitDataFile.parseFromGeneralPath(getDataFolder().getAbsolutePath(), "item_updaters");
         if(dataFile != null){
             parsedItemUpdaters = dataFile.deserialize("values", new TypeToken<Collection<DynamicItemUpdater>>(){}.getType());
