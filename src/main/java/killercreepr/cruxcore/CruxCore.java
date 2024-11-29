@@ -44,6 +44,7 @@ import killercreepr.cruxentities.entity.CruxMob;
 import killercreepr.cruxentities.entity.MobCategory;
 import killercreepr.cruxentities.registries.CruxEntityRegistries;
 import killercreepr.cruxexternal.CruxExternalModule;
+import killercreepr.cruxform.core.CruxFormModule;
 import killercreepr.cruxgeneration.CruxGenerationModule;
 import killercreepr.cruxitems.core.CruxItemsModule;
 import killercreepr.cruxitems.core.registries.CruxItemRegistries;
@@ -93,6 +94,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxAdvancementsModule CRUX_ADVANCEMENTS = new CruxAdvancementsModule();
     protected final CruxGenerationModule CRUX_GENERATION = new CruxGenerationModule();
     protected final CruxWorldsModule CRUX_WORLDS = new CruxWorldsModule();
+    protected final CruxFormModule CRUX_FORM = new CruxFormModule();
 
     public CruxExternalModule cruxExternal(){
         return CRUX_EXTERNAL;
@@ -149,6 +151,9 @@ public class CruxCore extends CruxPlugin implements Listener {
     public CruxGenerationModule cruxGeneration() {
         return CRUX_GENERATION;
     }
+    public CruxFormModule cruxForm() {
+        return CRUX_FORM;
+    }
 
     protected final StructureManager structureManager = new StructureManager(this);
 
@@ -183,7 +188,8 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_EXTERNAL,
             CRUX_ADVANCEMENTS,
             CRUX_GENERATION,
-            CRUX_WORLDS
+            CRUX_WORLDS,
+            CRUX_FORM
         ).load(this);
 
         loadTags();
