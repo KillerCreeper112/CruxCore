@@ -1,6 +1,5 @@
 package killercreepr.cruxcore.command;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -29,9 +28,6 @@ import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxcore.CruxCore;
-import killercreepr.cruxform.core.CruxFormModule;
-import net.minecraft.network.chat.LastSeenMessages;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
