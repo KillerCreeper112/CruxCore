@@ -6,6 +6,7 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
 import killercreepr.crux.api.component.parser.DataComponentDecoder;
+import killercreepr.crux.api.data.Reloadable;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
@@ -54,10 +55,12 @@ import killercreepr.cruxstats.core.CruxStatsModule;
 import killercreepr.cruxstats.core.stat.PlayerCruxStatHolder;
 import killercreepr.cruxstructures.CruxStructuresModule;
 import killercreepr.cruxstructures.manager.StructureManager;
-import killercreepr.cruxworlds.CruxWorldsModule;
-import killercreepr.cruxworlds.config.loader.NaturalEntityGroupGroupCfgLoader;
-import killercreepr.cruxworlds.world.manager.CruxWorldManager;
-import killercreepr.cruxworlds.world.manager.SimpleCruxWorldManager;
+import killercreepr.cruxworlds.api.world.CruxWorld;
+import killercreepr.cruxworlds.api.world.manager.CruxWorldManager;
+import killercreepr.cruxworlds.core.CruxWorldsModule;
+import killercreepr.cruxworlds.core.command.CruxWorldsCommands;
+import killercreepr.cruxworlds.core.config.loader.NaturalEntityGroupGroupCfgLoader;
+import killercreepr.cruxworlds.core.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.minecraft.world.entity.monster.Enemy;
@@ -73,11 +76,15 @@ import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 
 public class CruxCore extends CruxPlugin implements Listener {
     private static CruxCore instance;
     public static CruxCore inst(){ return instance; }
+    public static CruxCore core(){
+        return instance;
+    }
     protected final CruxModuleRegistry MODULES = CruxRegistries.MODULES;
     protected final CruxMainModule CRUX_MAIN = new CruxMainModule();
     protected final CruxItemsModule CRUX_ITEMS = new CruxItemsModule();
@@ -155,15 +162,16 @@ public class CruxCore extends CruxPlugin implements Listener {
         return CRUX_FORM;
     }
 
-    protected final StructureManager structureManager = new StructureManager(this);
-
-    public StructureManager structureManager() {
-        return structureManager;
-    }
-    protected final SimpleCruxWorldManager worldManager = new SimpleCruxWorldManager();
+    protected final SimpleCruxWorldManager worldManager = new SimpleCruxWorldManager(this);
 
     public CruxWorldManager worldManager() {
         return worldManager;
+    }
+
+    protected final StructureManager structureManager = new StructureManager(this, worldManager);
+
+    public StructureManager structureManager() {
+        return structureManager;
     }
 
     @Override
@@ -197,6 +205,7 @@ public class CruxCore extends CruxPlugin implements Listener {
 
         new CruxCoreCommands(this).register(this);
         new FAWECommands(this).register(this);
+        new CruxWorldsCommands("cruxworld", "crux.cmds.cruxworld.use", List.of("cworld"), worldManager).register(this);
 
         super.onLoad();
         CfgRegistries.SIMPLE_REGISTRY.forEach(reg ->{
@@ -226,7 +235,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             new ItemStackListener(this),
             worldManager
         );
-        structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
+        //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -235,12 +244,16 @@ public class CruxCore extends CruxPlugin implements Listener {
         DataComponentDecoder.componentDecoder().parseComponents(input);
     }
 
-
     @Override
     public void disabled() {
         super.disabled();
         MODULES.unregisterAll(this);
-        structureManager.saveAllWorlds();
+
+        for(CruxWorld world : worldManager.getWorlds()){
+            world.onUnload(true);
+        }
+
+        //structureManager.saveAllWorlds();
     }
 
     public void loadTags(){
@@ -393,7 +406,14 @@ public class CruxCore extends CruxPlugin implements Listener {
             new CruxFolder(this, "loot_tables").file()
         );
 
-        structureManager.loadConfiguration();
+        structureManager.reload(this);
+        for(CruxWorld world : worldManager.getWorlds()){
+            if(world instanceof Reloadable r){
+                r.reload(this);
+            }
+        }
+
+        //structureManager.loadConfiguration();
 
         CruxCore.inst().cruxMenus().menuRegistry().loadConfiguration(
             new CruxFolder(this, "menus").file()
