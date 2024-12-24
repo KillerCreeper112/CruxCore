@@ -38,6 +38,7 @@ import killercreepr.cruxcore.item.updater.DynamicItemUpdater;
 import killercreepr.cruxcore.item.updater.DynamicUpdater;
 import killercreepr.cruxcore.listener.ItemStackListener;
 import killercreepr.cruxcore.listener.PlayerDataListener;
+import killercreepr.cruxcore.listener.StructureListener;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
 import killercreepr.cruxenchants.core.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
@@ -53,8 +54,8 @@ import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
 import killercreepr.cruxstats.core.CruxStatsModule;
 import killercreepr.cruxstats.core.stat.PlayerCruxStatHolder;
-import killercreepr.cruxstructures.CruxStructuresModule;
-import killercreepr.cruxstructures.manager.StructureManager;
+import killercreepr.cruxstructures.core.CruxStructuresModule;
+import killercreepr.cruxstructures.core.manager.StructureManager;
 import killercreepr.cruxworlds.api.world.CruxWorld;
 import killercreepr.cruxworlds.api.world.manager.CruxWorldManager;
 import killercreepr.cruxworlds.core.CruxWorldsModule;
@@ -233,8 +234,10 @@ public class CruxCore extends CruxPlugin implements Listener {
             structureManager,
             new PlayerDataListener(),
             new ItemStackListener(this),
-            worldManager
+            worldManager,
+            new StructureListener()
         );
+        worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
         //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
     }
 
