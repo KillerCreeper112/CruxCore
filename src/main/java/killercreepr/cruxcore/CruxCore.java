@@ -32,6 +32,8 @@ import killercreepr.cruxconfig.config.common.file.DataFile;
 import killercreepr.cruxconfig.config.registry.CfgRegistries;
 import killercreepr.cruxcore.command.CruxCoreCommands;
 import killercreepr.cruxcore.command.FAWECommands;
+import killercreepr.cruxcore.component.CruxCoreComponents;
+import killercreepr.cruxcore.config.component.CfgCruxCoreComponents;
 import killercreepr.cruxcore.config.handler.FileDynamicItemUpdater;
 import killercreepr.cruxcore.config.handler.FileDynamicUpdater;
 import killercreepr.cruxcore.item.updater.DynamicItemUpdater;
@@ -219,6 +221,9 @@ public class CruxCore extends CruxPlugin implements Listener {
             mem.getDataHolders().register(new PlayerCruxStatHolder(mem));
             mem.getDataHolders().register(new PlayerBossBarHolder(mem));
         });
+
+        CruxCoreComponents.register();
+        CfgCruxCoreComponents.register(BukkitCfgHandlers.TYPED_DATA_COMPONENT.typeHandlers());
     }
 
     @Override
