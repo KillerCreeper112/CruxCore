@@ -20,8 +20,8 @@ import killercreepr.crux.core.registries.CruxModuleRegistry;
 import killercreepr.crux.core.registries.CruxRegistries;
 import killercreepr.cruxadvancements.core.CruxAdvancementsModule;
 import killercreepr.cruxattributes.core.CruxAttributesModule;
-import killercreepr.cruxblocks.api.block.manager.CruxBlockTicker;
 import killercreepr.cruxblocks.core.CruxBlocksModule;
+import killercreepr.cruxblocks.core.block.manager.SimpleCruxBlockManager;
 import killercreepr.cruxconfig.CruxConfigsModule;
 import killercreepr.cruxconfig.config.bukkit.file.BukkitDataFile;
 import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
@@ -38,6 +38,7 @@ import killercreepr.cruxcore.config.handler.FileDynamicItemUpdater;
 import killercreepr.cruxcore.config.handler.FileDynamicUpdater;
 import killercreepr.cruxcore.item.updater.DynamicItemUpdater;
 import killercreepr.cruxcore.item.updater.DynamicUpdater;
+import killercreepr.cruxcore.listener.CruxWorldListener;
 import killercreepr.cruxcore.listener.ItemStackListener;
 import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxcore.listener.StructureListener;
@@ -88,6 +89,19 @@ public class CruxCore extends CruxPlugin implements Listener {
     public static CruxCore core(){
         return instance;
     }
+
+    protected final SimpleCruxWorldManager worldManager = new SimpleCruxWorldManager(this);
+
+    public CruxWorldManager worldManager() {
+        return worldManager;
+    }
+
+    protected final StructureManager structureManager = new StructureManager(this, worldManager);
+
+    public StructureManager structureManager() {
+        return structureManager;
+    }
+
     protected final CruxModuleRegistry MODULES = CruxRegistries.MODULES;
     protected final CruxMainModule CRUX_MAIN = new CruxMainModule();
     protected final CruxItemsModule CRUX_ITEMS = new CruxItemsModule();
@@ -98,7 +112,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxStatsModule CRUX_STATS = new CruxStatsModule();
     protected final CruxEntitiesModule CRUX_ENTITIES = new CruxEntitiesModule();
     protected final CruxEnchantsModule CRUX_ENCHANTS = new CruxEnchantsModule();
-    protected final CruxBlocksModule CRUX_BLOCKS = new CruxBlocksModule(CruxBlockTicker.simple(this));
+    protected final CruxBlocksModule CRUX_BLOCKS = new CruxBlocksModule(worldManager);
     protected final CruxStructuresModule CRUX_STRUCTURES = new CruxStructuresModule();
     protected final CruxExternalModule CRUX_EXTERNAL = new CruxExternalModule();
     protected final CruxAdvancementsModule CRUX_ADVANCEMENTS = new CruxAdvancementsModule();
@@ -165,18 +179,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         return CRUX_FORM;
     }
 
-    protected final SimpleCruxWorldManager worldManager = new SimpleCruxWorldManager(this);
-
-    public CruxWorldManager worldManager() {
-        return worldManager;
-    }
-
-    protected final StructureManager structureManager = new StructureManager(this, worldManager);
-
-    public StructureManager structureManager() {
-        return structureManager;
-    }
-
     @Override
     public void onLoad() {
         instance = this;
@@ -240,7 +242,9 @@ public class CruxCore extends CruxPlugin implements Listener {
             new PlayerDataListener(),
             new ItemStackListener(this),
             worldManager,
-            new StructureListener()
+            new StructureListener(),
+            new CruxWorldListener(cruxBlocks().getBlockRegistry()),
+            new SimpleCruxBlockManager(worldManager)
         );
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
         //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
