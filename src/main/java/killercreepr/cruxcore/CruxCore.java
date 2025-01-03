@@ -24,6 +24,7 @@ import killercreepr.cruxblocks.core.CruxBlocksModule;
 import killercreepr.cruxblocks.core.block.manager.SimpleCruxBlockManager;
 import killercreepr.cruxconfig.CruxConfigsModule;
 import killercreepr.cruxconfig.config.bukkit.file.BukkitDataFile;
+import killercreepr.cruxconfig.config.bukkit.file.Cfg;
 import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
 import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
@@ -33,6 +34,7 @@ import killercreepr.cruxconfig.config.registry.CfgRegistries;
 import killercreepr.cruxcore.command.CruxCoreCommands;
 import killercreepr.cruxcore.command.FAWECommands;
 import killercreepr.cruxcore.component.CruxCoreComponents;
+import killercreepr.cruxcore.config.CruxCoreConfig;
 import killercreepr.cruxcore.config.component.CfgCruxCoreComponents;
 import killercreepr.cruxcore.config.handler.FileDynamicItemUpdater;
 import killercreepr.cruxcore.config.handler.FileDynamicUpdater;
@@ -228,12 +230,15 @@ public class CruxCore extends CruxPlugin implements Listener {
         CfgCruxCoreComponents.register(BukkitCfgHandlers.TYPED_DATA_COMPONENT.typeHandlers());
     }
 
+    protected CruxCoreConfig cfg;
     @Override
     public void enabled() {
         //enable modules.
         //they will automatically add in their listeners
         MODULES.enable(this);
         CRUX_ITEMS.registerGeneralDisplayFormatter();
+
+        cfg = new CruxCoreConfig(this, "config");
 
         reload();
         registerListeners(
@@ -391,6 +396,8 @@ public class CruxCore extends CruxPlugin implements Listener {
     @Override
     public void reload() {
         super.reload();
+        cfg.setup();
+        Crux.debug = cfg.DEBUG.value().value().shortValue();
         loadTags();
         //CRUX_CONFIGS.reload(this);
 
