@@ -2,10 +2,8 @@ package killercreepr.cruxcore;
 
 import com.google.common.reflect.TypeToken;
 import io.papermc.paper.entity.CollarColorable;
-import io.papermc.paper.event.player.AsyncChatEvent;
 import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
-import killercreepr.crux.api.component.parser.DataComponentDecoder;
 import killercreepr.crux.api.data.Reloadable;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
@@ -24,7 +22,6 @@ import killercreepr.cruxblocks.core.CruxBlocksModule;
 import killercreepr.cruxblocks.core.block.manager.SimpleCruxBlockManager;
 import killercreepr.cruxconfig.CruxConfigsModule;
 import killercreepr.cruxconfig.config.bukkit.file.BukkitDataFile;
-import killercreepr.cruxconfig.config.bukkit.file.Cfg;
 import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
 import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
@@ -68,7 +65,6 @@ import killercreepr.cruxworlds.core.command.CruxWorldsCommands;
 import killercreepr.cruxworlds.core.config.loader.NaturalEntityGroupGroupCfgLoader;
 import killercreepr.cruxworlds.core.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import org.bukkit.command.Command;
@@ -76,7 +72,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
@@ -253,12 +248,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         );
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
         //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onAsyncChat(AsyncChatEvent event) {
-        String input = PlainTextComponentSerializer.plainText().serialize(event.originalMessage());
-        DataComponentDecoder.componentDecoder().parseComponents(input);
     }
 
     @Override
@@ -461,7 +450,6 @@ public class CruxCore extends CruxPlugin implements Listener {
         }
         getServer().updateRecipes();
     }
-
 
     protected Collection<DynamicItemUpdater> parsedItemUpdaters;
 
