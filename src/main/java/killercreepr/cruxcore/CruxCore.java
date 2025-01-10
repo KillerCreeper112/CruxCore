@@ -2,12 +2,16 @@ package killercreepr.cruxcore;
 
 import com.google.common.reflect.TypeToken;
 import io.papermc.paper.entity.CollarColorable;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
 import killercreepr.crux.api.data.Reloadable;
+import killercreepr.crux.api.data.User;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
+import killercreepr.crux.api.text.tags.TagsPrefixBuilder;
+import killercreepr.crux.api.text.tags.container.TagContainer;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.block.tag.BaseBlockTag;
 import killercreepr.crux.core.entity.memory.standard.PlayerBossBarHolder;
@@ -65,19 +69,26 @@ import killercreepr.cruxworlds.core.command.CruxWorldsCommands;
 import killercreepr.cruxworlds.core.config.loader.NaturalEntityGroupGroupCfgLoader;
 import killercreepr.cruxworlds.core.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class CruxCore extends CruxPlugin implements Listener {
@@ -249,6 +260,18 @@ public class CruxCore extends CruxPlugin implements Listener {
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
         //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
     }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onAsyncChat(AsyncChatEvent event) {
+        event.setCancelled(true);
+        String msg = PlainTextComponentSerializer.plainText().serialize(event.message());
+        Component c = Crux.format().deserialize(msg, TagContainer.string().hook(event.getPlayer(), TagsPrefixBuilder.overwriteBase("viewer_"))
+            .hook(User.user(UUID.randomUUID(), "testjeiojdow")));
+        Crux.scheduler().runTask(() ->{
+            Bukkit.broadcast(Component.text("output: ").append(c));
+        });
+    }
+
 
     @Override
     public void disabled() {
