@@ -43,7 +43,10 @@ public class CraftingRecipeLoader {
             recipe.shape(shape.toArray(new String[0]));
             ingredients.forEach((id, ingredient) ->{
                 ItemStack ingredientItem = ingredient.buildItem(ctx);
-                if(ingredientItem==null) return;
+                if(ingredientItem==null){
+                    Crux.log(Level.SEVERE, "Cannot built ingredient, " + id + "!");
+                    return;
+                }
                 recipe.setIngredient(id.charAt(0), ingredientItem);
             });
 
