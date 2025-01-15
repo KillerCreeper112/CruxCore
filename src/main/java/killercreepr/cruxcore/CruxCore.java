@@ -54,6 +54,8 @@ import killercreepr.cruxitems.core.CruxItemsModule;
 import killercreepr.cruxitems.core.registries.CruxItemRegistries;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxpotions.CruxPotionsModule;
+import killercreepr.cruxstatistics.core.CruxStatisticsModule;
+import killercreepr.cruxstatistics.core.statistic.PlayerCruxStatisticHolder;
 import killercreepr.cruxstats.core.CruxStatsModule;
 import killercreepr.cruxstats.core.stat.PlayerCruxStatHolder;
 import killercreepr.cruxstructures.core.CruxStructuresModule;
@@ -116,6 +118,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxGenerationModule CRUX_GENERATION = new CruxGenerationModule();
     protected final CruxWorldsModule CRUX_WORLDS = new CruxWorldsModule();
     protected final CruxFormModule CRUX_FORM = new CruxFormModule();
+    protected final CruxStatisticsModule CRUX_STATISTICS = new CruxStatisticsModule();
 
     public CruxExternalModule cruxExternal(){
         return CRUX_EXTERNAL;
@@ -175,6 +178,9 @@ public class CruxCore extends CruxPlugin implements Listener {
     public CruxFormModule cruxForm() {
         return CRUX_FORM;
     }
+    public CruxStatisticsModule cruxStatistics() {
+        return CRUX_STATISTICS;
+    }
 
     @Override
     public void onLoad() {
@@ -199,7 +205,8 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_ADVANCEMENTS,
             CRUX_GENERATION,
             CRUX_WORLDS,
-            CRUX_FORM
+            CRUX_FORM,
+            CRUX_STATISTICS
         ).load(this);
 
         loadTags();
@@ -219,6 +226,7 @@ public class CruxCore extends CruxPlugin implements Listener {
             if(!(m instanceof PlayerMemory mem)) return;
             mem.getDataHolders().register(new PlayerCruxStatHolder(mem));
             mem.getDataHolders().register(new PlayerBossBarHolder(mem));
+            mem.getDataHolders().register(new PlayerCruxStatisticHolder(mem));
         });
 
         CruxCoreComponents.register();
