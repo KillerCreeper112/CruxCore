@@ -1,7 +1,9 @@
 package killercreepr.cruxcore.config.component;
 
+import killercreepr.crux.api.communication.Communicator;
 import killercreepr.crux.api.component.TypedDataComponent;
 import killercreepr.crux.api.entity.tag.EntityTag;
+import killercreepr.crux.core.communication.MsgContainer;
 import killercreepr.cruxconfig.config.bukkit.handler.impl.component.FileDataComponentType;
 import killercreepr.cruxconfig.config.bukkit.registry.FileDataComponentRegistry;
 import killercreepr.cruxconfig.config.common.FileContext;
@@ -32,6 +34,20 @@ public class CfgCruxCoreComponents {
             public @Nullable TypedDataComponent<StructureDenyMobSpawns> deserializeFromFile(@NotNull FileContext<?> ctx, @NotNull FileObject o) {
                 EntityTag filter = ctx.getRegistry().deserializeFromFile(EntityTag.class, o.get("filter"));
                 return TypedDataComponent.create(CruxCoreComponents.STRUCTURE_DENY_MOB_SPAWNS, new StructureDenyMobSpawns(filter));
+            }
+        });
+        registry.register("structure/enter_message", new FileDataComponentType<Communicator>(){
+            @Override
+            public @Nullable TypedDataComponent<Communicator> deserializeFromFile(@NotNull FileContext<?> ctx, @NotNull FileObject o) {
+                Communicator msg = ctx.getRegistry().deserializeFromFile(MsgContainer.class, o.get("msg"));
+                return TypedDataComponent.create(CruxCoreComponents.STRUCTURE_ENTER_MESSAGE, msg);
+            }
+        });
+        registry.register("structure/leave_message", new FileDataComponentType<Communicator>(){
+            @Override
+            public @Nullable TypedDataComponent<Communicator> deserializeFromFile(@NotNull FileContext<?> ctx, @NotNull FileObject o) {
+                Communicator msg = ctx.getRegistry().deserializeFromFile(MsgContainer.class, o.get("msg"));
+                return TypedDataComponent.create(CruxCoreComponents.STRUCTURE_LEAVE_MESSAGE, msg);
             }
         });
     }
