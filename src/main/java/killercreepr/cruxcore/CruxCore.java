@@ -326,6 +326,30 @@ public class CruxCore extends CruxPlugin implements Listener {
                 return CruxMob.is(entity);
             }
         });
+        registerEntityTag(new BaseEntityTag(Crux.key("crux_monster")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return CruxMob.isInCategory(entity, MobCategory.MONSTER);
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("crux_enemy")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return CruxMob.isInCategory(entity, MobCategory.ENEMY);
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("crux_neutral")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return CruxMob.isInCategory(entity, MobCategory.NEUTRAL);
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("crux_animal")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return CruxMob.isInCategory(entity, MobCategory.ANIMAL);
+            }
+        });
         for(MobCategory category : CruxEntityRegistries.MOB_CATEGORY){
             registerEntityTag(
                 new BaseEntityTag(Key.key(category.key().namespace(), "crux_mob_category/" + category.key().value())) {

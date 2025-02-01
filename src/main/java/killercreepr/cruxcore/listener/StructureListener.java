@@ -7,10 +7,14 @@ import killercreepr.cruxblocks.api.event.CruxBlockPlaceEvent;
 import killercreepr.cruxblocks.api.mining.user.Miner;
 import killercreepr.cruxblocks.core.mining.user.EntityMiner;
 import killercreepr.cruxcore.CruxCore;
+import killercreepr.cruxcore.component.CruxCoreComponents;
+import killercreepr.cruxcore.structure.component.StructureDenyMobSpawns;
 import killercreepr.cruxstructures.api.component.BlockManipulatorComponent;
 import killercreepr.cruxstructures.api.component.StoredBlocks;
 import killercreepr.cruxstructures.api.structure.StoredStructure;
+import killercreepr.cruxstructures.api.structure.Structure;
 import killercreepr.cruxstructures.api.world.module.StructureWorldModule;
+import killercreepr.cruxstructures.core.registries.StructureRegistries;
 import killercreepr.cruxstructures.core.structure.component.StoredStructureComponents;
 import killercreepr.cruxstructures.core.structure.component.StructureComponents;
 import killercreepr.cruxstructures.core.structure.component.StructureOuterBoxComponent;
@@ -24,10 +28,35 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class StructureListener implements Listener {
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
+        Entity e = event.getEntity();
+        CruxWorld crux = CruxCore.core().worldManager().getWorld(e.getWorld().getUID());
+        if(crux == null) return;
+        StructureWorldModule module = crux.getModule(StructureWorldModule.class);
+        if(module == null) return;
+        Vector pos = e.getLocation().toVector();
+        StoredStructure stored = CruxCollection.getFirst(module.getStored(check ->{
+            StructureOuterBoxComponent outerBox = (StructureOuterBoxComponent) check.getParent().get(StructureComponents.OUTER_BOX);
+            if(outerBox == null || !outerBox.disableBlockPlace()) return false;
+            BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
+            return box.contains(pos);
+        }));
+        if(stored == null) return;
+        Structure structure = StructureRegistries.STRUCTURES.get(stored.getStructureKey());
+        if(structure == null) return;
+        StructureDenyMobSpawns deny = structure.get(CruxCoreComponents.STRUCTURE_DENY_MOB_SPAWNS);
+        if(deny == null) return;
+        if(!deny.test(e)) return;
+        event.setCancelled(true);
+    }
+
+
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getPlayer().hasPermission("cruxcore.structure.block.place.bypass")) return;
