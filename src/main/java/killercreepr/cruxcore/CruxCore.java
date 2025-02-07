@@ -60,6 +60,7 @@ import killercreepr.cruxstats.core.CruxStatsModule;
 import killercreepr.cruxstats.core.stat.PlayerCruxStatHolder;
 import killercreepr.cruxstructures.core.CruxStructuresModule;
 import killercreepr.cruxstructures.core.manager.StructureManager;
+import killercreepr.cruxtickables.core.CruxTickablesModule;
 import killercreepr.cruxworlds.api.world.CruxWorld;
 import killercreepr.cruxworlds.api.world.manager.CruxWorldManager;
 import killercreepr.cruxworlds.core.CruxWorldsModule;
@@ -119,6 +120,7 @@ public class CruxCore extends CruxPlugin implements Listener {
     protected final CruxWorldsModule CRUX_WORLDS = new CruxWorldsModule();
     protected final CruxFormModule CRUX_FORM = new CruxFormModule();
     protected final CruxStatisticsModule CRUX_STATISTICS = new CruxStatisticsModule();
+    protected final CruxTickablesModule CRUX_TICKABLES = new CruxTickablesModule();
 
     public CruxExternalModule cruxExternal(){
         return CRUX_EXTERNAL;
@@ -181,6 +183,9 @@ public class CruxCore extends CruxPlugin implements Listener {
     public CruxStatisticsModule cruxStatistics() {
         return CRUX_STATISTICS;
     }
+    public CruxTickablesModule cruxTickables() {
+        return CRUX_TICKABLES;
+    }
 
     @Override
     public void onLoad() {
@@ -206,7 +211,8 @@ public class CruxCore extends CruxPlugin implements Listener {
             CRUX_GENERATION,
             CRUX_WORLDS,
             CRUX_FORM,
-            CRUX_STATISTICS
+            CRUX_STATISTICS,
+            CRUX_TICKABLES
         ).load(this);
 
         loadTags();

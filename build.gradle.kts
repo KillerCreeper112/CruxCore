@@ -32,6 +32,7 @@ dependencies {
         "E:\\Plugins\\Crux2.0\\crux\\CruxStats\\build\\libs\\CruxStats-1.0.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxForm\\build\\libs\\CruxForm-1.0.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxStatistics\\build\\libs\\CruxStatistics-1.0.jar",
+        "E:\\Plugins\\Crux2.0\\crux\\CruxTickables\\build\\libs\\CruxTickables-1.0.jar",
     ))
 
     compileOnly(fileTree("libs") {
