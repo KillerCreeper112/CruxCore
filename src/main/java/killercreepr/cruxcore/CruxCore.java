@@ -268,8 +268,8 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         );
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
 
-        LANG = new SimpleCreateLang();
-        langProvider = new SimpleLangConfig(this, "lang", this::lang, Object.class);
+        //LANG = new SimpleCreateLang();
+        //langProvider = new SimpleLangConfig(this, "lang", this::lang, Object.class);
         //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
     }
 
@@ -435,7 +435,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         cfg.setup();
         Crux.debug = cfg.DEBUG.value().value().shortValue();
         loadTags();
-        langProvider.reload(this);
+        //langProvider.reload(this);
 
         //CRUX_CONFIGS.reload(this);
 
