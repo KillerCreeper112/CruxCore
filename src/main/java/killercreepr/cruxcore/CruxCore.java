@@ -4,12 +4,15 @@ import com.google.common.reflect.TypeToken;
 import io.papermc.paper.entity.CollarColorable;
 import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
+import killercreepr.crux.api.communication.lang.CreateLang;
+import killercreepr.crux.api.communication.lang.LangProvider;
 import killercreepr.crux.api.data.Reloadable;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.block.tag.BaseBlockTag;
+import killercreepr.crux.core.communication.lang.SimpleCreateLang;
 import killercreepr.crux.core.entity.memory.standard.PlayerBossBarHolder;
 import killercreepr.crux.core.entity.tag.BaseEntityTag;
 import killercreepr.crux.core.plugin.CruxPlugin;
@@ -26,6 +29,7 @@ import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
 import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
 import killercreepr.cruxconfig.config.bukkit.loader.*;
+import killercreepr.cruxconfig.config.bukkit.standard.SimpleLangConfig;
 import killercreepr.cruxconfig.config.common.file.DataFile;
 import killercreepr.cruxconfig.config.registry.CfgRegistries;
 import killercreepr.cruxcore.command.CruxCoreCommands;
@@ -83,7 +87,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
-public class CruxCore extends CruxPlugin implements Listener {
+public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     private static CruxCore instance;
     public static CruxCore inst(){ return instance; }
     public static CruxCore core(){
@@ -187,6 +191,8 @@ public class CruxCore extends CruxPlugin implements Listener {
         return CRUX_TICKABLES;
     }
 
+    public CreateLang LANG = new SimpleCreateLang();
+
     @Override
     public void onLoad() {
         instance = this;
@@ -238,7 +244,7 @@ public class CruxCore extends CruxPlugin implements Listener {
         CruxCoreComponents.register();
         CfgCruxCoreComponents.register(BukkitCfgHandlers.TYPED_DATA_COMPONENT.typeHandlers());
     }
-
+    protected LangProvider langProvider;
     protected CruxCoreConfig cfg;
     @Override
     public void enabled() {
@@ -261,6 +267,9 @@ public class CruxCore extends CruxPlugin implements Listener {
             new SimpleCruxBlockManager(worldManager)
         );
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
+
+        LANG = new SimpleCreateLang();
+        langProvider = new SimpleLangConfig(this, "lang", this::lang, Object.class);
         //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
     }
 
@@ -426,6 +435,8 @@ public class CruxCore extends CruxPlugin implements Listener {
         cfg.setup();
         Crux.debug = cfg.DEBUG.value().value().shortValue();
         loadTags();
+        langProvider.reload(this);
+
         //CRUX_CONFIGS.reload(this);
 
         new KeyLootTableLoader().loadConfiguration(
@@ -495,5 +506,10 @@ public class CruxCore extends CruxPlugin implements Listener {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         reload();
         return super.onCommand(sender, command, label, args);
+    }
+
+    @Override
+    public @NotNull CreateLang lang() {
+        return LANG;
     }
 }
