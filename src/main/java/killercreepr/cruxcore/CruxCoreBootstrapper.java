@@ -11,5 +11,6 @@ public class CruxCoreBootstrapper implements PluginBootstrap {
      */
     @Override
     public void bootstrap(BootstrapContext context) {
+
     }
 }
