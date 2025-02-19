@@ -19,7 +19,6 @@ import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.plugin.module.CruxMainModule;
 import killercreepr.crux.core.registries.CruxModuleRegistry;
 import killercreepr.crux.core.registries.CruxRegistries;
-import killercreepr.crux.core.util.CruxMath;
 import killercreepr.cruxadvancements.core.CruxAdvancementsModule;
 import killercreepr.cruxattributes.core.CruxAttributesModule;
 import killercreepr.cruxblocks.core.CruxBlocksModule;

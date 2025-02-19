@@ -27,3 +27,6 @@ dependencies:
     zAuctionHouseV3:
       load: BEFORE
       required: false
+    LibsDisguises:
+      load: BEFORE
+      required: false
