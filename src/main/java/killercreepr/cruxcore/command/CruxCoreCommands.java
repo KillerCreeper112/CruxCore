@@ -1,6 +1,7 @@
 package killercreepr.cruxcore.command;
 
 import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -10,6 +11,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import killercreepr.crux.api.communication.CreateTitle;
 import killercreepr.crux.api.plugin.module.CruxModule;
 import killercreepr.crux.api.text.tags.container.TagContainer;
 import killercreepr.crux.core.Crux;
@@ -148,6 +150,47 @@ public class CruxCoreCommands {
                             getExecutor(ctx.getSource()).sendActionBar(output);
                             return 1;
                         })
+                )
+        ).then(
+            Commands.literal("title")
+                .then(
+                    Commands.argument("fade_in", IntegerArgumentType.integer())
+                        .then(
+                            Commands.argument("stay", IntegerArgumentType.integer())
+                                .then(
+                                    Commands.argument("fade_out", IntegerArgumentType.integer())
+                                        .then(
+                                            Commands.argument("text", StringArgumentType.string())
+                                                .executes(ctx ->{
+                                                    int fadeIn = ctx.getArgument("fade_in", Integer.class);
+                                                    int stay = ctx.getArgument("stay", Integer.class);
+                                                    int fadeOut = ctx.getArgument("fade_out", Integer.class);
+                                                    String text = ctx.getArgument("text", String.class);
+                                                    CreateTitle title = CreateTitle.title(
+                                                        text, null, fadeIn, stay, fadeOut
+                                                    );
+                                                    title.use(getExecutor(ctx.getSource()), TagContainer.merged()
+                                                        .hook(getExecutor(ctx.getSource())));
+                                                    return 1;
+                                                }).then(
+                                                    Commands.argument("sub_text", StringArgumentType.greedyString())
+                                                        .executes(ctx ->{
+                                                            int fadeIn = ctx.getArgument("fade_in", Integer.class);
+                                                            int stay = ctx.getArgument("stay", Integer.class);
+                                                            int fadeOut = ctx.getArgument("fade_out", Integer.class);
+                                                            String text = ctx.getArgument("text", String.class);
+                                                            String subText = ctx.getArgument("text", String.class);
+                                                            CreateTitle title = CreateTitle.title(
+                                                                text, subText, fadeIn, stay, fadeOut
+                                                            );
+                                                            title.use(getExecutor(ctx.getSource()), TagContainer.merged()
+                                                                .hook(getExecutor(ctx.getSource())));
+                                                            return 1;
+                                                        })
+                                                )
+                                        )
+                                )
+                        )
                 )
         ).then(
             Commands.literal("msg")
