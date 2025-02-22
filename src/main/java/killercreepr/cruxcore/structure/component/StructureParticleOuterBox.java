@@ -1,7 +1,7 @@
 package killercreepr.cruxcore.structure.component;
 
+import killercreepr.crux.api.data.world.StoredChunk;
 import killercreepr.crux.api.math.CruxPosition;
-import killercreepr.crux.core.data.world.StoredChunk;
 import killercreepr.cruxcore.component.CruxCoreComponents;
 import killercreepr.cruxstructures.api.component.StoredStructureComponent;
 import killercreepr.cruxstructures.api.component.StructureComponent;

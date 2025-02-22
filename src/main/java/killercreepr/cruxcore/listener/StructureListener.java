@@ -46,7 +46,7 @@ public class StructureListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         Entity e = event.getEntity();
-        CruxWorld crux = CruxCore.core().worldManager().getWorld(e.getWorld().getUID());
+        CruxWorld crux = CruxCore.core().worldManager().getWorld(e.getWorld().key());
         if(crux == null) return;
         StructureWorldModule module = crux.getModule(StructureWorldModule.class);
         if(module == null) return;
@@ -85,7 +85,7 @@ public class StructureListener implements Listener {
     }
 
     public void blockPlace(Block b, Cancellable event){
-        CruxWorld crux = CruxCore.core().worldManager().getWorld(b.getWorld().getUID());
+        CruxWorld crux = CruxCore.core().worldManager().getWorld(b.getWorld().key());
         if(crux == null) return;
         StructureWorldModule module = crux.getModule(StructureWorldModule.class);
         if(module == null) return;
@@ -119,7 +119,7 @@ public class StructureListener implements Listener {
 
     public void blockBreak(Block b, Cancellable event){
         if(b.getType() == Material.DECORATED_POT) return;
-        CruxWorld crux = CruxCore.core().worldManager().getWorld(b.getWorld().getUID());
+        CruxWorld crux = CruxCore.core().worldManager().getWorld(b.getWorld().key());
         if(crux == null) return;
         StructureWorldModule module = crux.getModule(StructureWorldModule.class);
         if(module == null) return;
@@ -190,7 +190,7 @@ public class StructureListener implements Listener {
         if(holder == null) return;
         if(CruxMath.hasOccurredWithin(holder.getLastTicked(), 40)) return;
         holder.setLastTicked(System.currentTimeMillis());
-        CruxWorld world = CruxCore.core().worldManager().getWorld(event.getTo().getWorld().getUID());
+        CruxWorld world = CruxCore.core().worldManager().getWorld(event.getTo().getWorld().key());
         if(world == null) return;
         StructureWorldModule module = world.getModule(StructureWorldModule.class);
         if(module == null) return;
