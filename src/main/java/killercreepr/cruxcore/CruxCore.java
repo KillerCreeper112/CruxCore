@@ -45,6 +45,14 @@ import killercreepr.cruxcore.listener.ItemStackListener;
 import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxcore.listener.StructureListener;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
+import killercreepr.cruxcrafting.api.crafting.CruxCraftingRecipeManager;
+import killercreepr.cruxcrafting.core.CruxCraftingModule;
+import killercreepr.cruxcrafting.core.config.CruxCraftingCfg;
+import killercreepr.cruxcrafting.core.config.loader.CruxCraftingIngredientLoader;
+import killercreepr.cruxcrafting.core.config.loader.CruxCraftingRecipeLoader;
+import killercreepr.cruxcrafting.core.crafting.SimpleCraftingRecipeManager;
+import killercreepr.cruxcrafting.core.listener.CraftingListener;
+import killercreepr.cruxcrafting.core.registries.CruxCraftingRegistries;
 import killercreepr.cruxenchants.core.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
 import killercreepr.cruxentities.entity.CruxMob;
@@ -71,6 +79,7 @@ import killercreepr.cruxworlds.core.command.CruxWorldsCommands;
 import killercreepr.cruxworlds.core.config.loader.NaturalEntityGroupGroupCfgLoader;
 import killercreepr.cruxworlds.core.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.Keyed;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import org.bukkit.command.Command;
@@ -124,6 +133,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     protected final CruxFormModule CRUX_FORM = new CruxFormModule();
     protected final CruxStatisticsModule CRUX_STATISTICS = new CruxStatisticsModule();
     protected final CruxTickablesModule CRUX_TICKABLES = new CruxTickablesModule();
+    protected final CruxCraftingModule CRUX_CRAFTING = new CruxCraftingModule();
 
     public CruxExternalModule cruxExternal(){
         return CRUX_EXTERNAL;
@@ -161,6 +171,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
     public CruxPotionsModule cruxPotions() {
         return CRUX_POTIONS;
+    }
+    public CruxCraftingModule cruxCrafting() {
+        return CRUX_CRAFTING;
     }
 
     public CruxAttributesModule cruxAttributes() {
@@ -217,7 +230,8 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             CRUX_WORLDS,
             CRUX_FORM,
             CRUX_STATISTICS,
-            CRUX_TICKABLES
+            CRUX_TICKABLES,
+            CRUX_CRAFTING
         ).load(this);
 
         loadTags();
@@ -245,6 +259,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     }
     protected LangProvider langProvider;
     protected CruxCoreConfig cfg;
+    protected final CruxCraftingRecipeManager craftingManager = new SimpleCraftingRecipeManager();
     @Override
     public void enabled() {
         //enable modules.
@@ -263,7 +278,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             worldManager,
             new StructureListener(),
             new CruxWorldListener(cruxBlocks().getBlockRegistry()),
-            new SimpleCruxBlockManager(worldManager)
+            new SimpleCruxBlockManager(worldManager),
+
+            new CraftingListener(this, craftingManager)
         );
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
 
@@ -477,6 +494,22 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
         new CraftingRecipeLoader().load(
             new CruxConfig(this, "crafting_recipes"), getServer()
+        );
+
+        new CruxCraftingIngredientLoader(CruxCraftingCfg.FILE_CRUX_RECIPE_INGREDIENT, ingredient ->{
+            CruxCraftingRegistries.RECIPE_INGREDIENT.register(ingredient);
+            Crux.log(Level.INFO, "Crux recipe ingredient registered: " + ((Keyed) ingredient).key());
+        }).loadFromSingleFile(
+            new CruxConfig(this, "crafting/ingredient/crux_ingredients")
+        ).loadConfiguration(
+            new CruxFolder(this, "crafting/ingredient/crux").file()
+        );
+
+        new CruxCraftingRecipeLoader(CruxCraftingCfg.FILE_CRUX_CRAFTING_RECIPE, recipe ->{
+            craftingManager.addRecipe(recipe);
+            Crux.log(Level.INFO, "Crux crafting recipe registered: " + ((Keyed) recipe).key());
+        }).loadConfiguration(
+            new CruxFolder(this, "crafting/recipe/global").file()
         );
 
         if(parsedItemUpdaters != null){
