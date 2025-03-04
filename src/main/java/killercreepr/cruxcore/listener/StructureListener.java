@@ -9,6 +9,8 @@ import killercreepr.crux.core.util.CruxMath;
 import killercreepr.cruxblocks.api.event.CruxBlockBreakEvent;
 import killercreepr.cruxblocks.api.event.CruxBlockPlaceEvent;
 import killercreepr.cruxblocks.api.mining.user.Miner;
+import killercreepr.cruxblocks.api.structure.component.StructureCruxBlockPlaceInsideComponent;
+import killercreepr.cruxblocks.core.block.component.CruxBlockComponents;
 import killercreepr.cruxblocks.core.mining.user.EntityMiner;
 import killercreepr.cruxcore.CruxCore;
 import killercreepr.cruxcore.api.event.PlayerEnterStructureEvent;
@@ -18,6 +20,7 @@ import killercreepr.cruxcore.entity.memory.StructureWalkerHolder;
 import killercreepr.cruxcore.structure.component.StructureDenyMobSpawns;
 import killercreepr.cruxstructures.api.component.BlockManipulatorComponent;
 import killercreepr.cruxstructures.api.component.StoredBlocks;
+import killercreepr.cruxstructures.api.component.StructureBlockPlaceInsideComponent;
 import killercreepr.cruxstructures.api.structure.ActiveStructure;
 import killercreepr.cruxstructures.api.structure.StoredStructure;
 import killercreepr.cruxstructures.api.structure.Structure;
@@ -41,6 +44,11 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class StructureListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -66,7 +74,8 @@ public class StructureListener implements Listener {
         event.setCancelled(true);
     }
 
-
+    protected final Map<Block, Collection<StoredStructure>> blockPlaceInside = new HashMap<>();
+    protected final Map<Block, Collection<StoredStructure>> cruxBlockPlaceInside = new HashMap<>();
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getPlayer().hasPermission("cruxcore.structure.block.place.bypass")) return;
@@ -74,29 +83,104 @@ public class StructureListener implements Listener {
         blockPlace(b, event);
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockPlaceHighest(BlockPlaceEvent event) {
+        Block b = event.getBlock();
+        var list = blockPlaceInside.remove(b);
+        if(list == null) return;
+        for(var stored : list){
+            StructureBlockPlaceInsideComponent placed = stored.getOrDefault(
+                StructureComponents.BLOCK_PLACE_INSIDE, stored.getParent().get(StructureComponents.BLOCK_PLACE_INSIDE)
+            );
+            if(placed==null) return;
+            placed.onBlockPlace(stored, event);
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onCruxBlockPlace(CruxBlockPlaceEvent event) {
         Miner miner = event.getContext().getMiner();
+        //todo may want to possibly allow more miners for the StructureCruxBlockPlace component
         if(!(miner instanceof EntityMiner entityMiner)) return;
         Entity e = entityMiner.getEntity();
         if(e.hasPermission("cruxcore.structure.block.place.bypass")) return;
         Block b = event.getContext().getBlock();
-        blockPlace(b, event);
+        cruxBlockPlace(b, event);
     }
 
-    public void blockPlace(Block b, Cancellable event){
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCruxBlockPlaceHighest(CruxBlockPlaceEvent event) {
+        Block b = event.getContext().getBlock();
+        var list = cruxBlockPlaceInside.remove(b);
+        if(list == null) return;
+        for(var stored : list){
+            StructureCruxBlockPlaceInsideComponent placed = stored.getOrDefault(
+                CruxBlockComponents.CRUX_BLOCK_PLACE_INSIDE, stored.getParent().get(CruxBlockComponents.CRUX_BLOCK_PLACE_INSIDE)
+            );
+            if(placed==null) return;
+            placed.onCruxBlockPlace(stored, event);
+        }
+    }
+
+    public void cruxBlockPlace(Block b, CruxBlockPlaceEvent event){
         CruxWorld crux = CruxCore.core().worldManager().getWorld(b.getWorld().key());
         if(crux == null) return;
         StructureWorldModule module = crux.getModule(StructureWorldModule.class);
         if(module == null) return;
         Vector pos = b.getLocation().toVector();
+
+        module.getStored(check ->{
+            BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
+            StructureCruxBlockPlaceInsideComponent comp = check.getOrDefault(
+                CruxBlockComponents.CRUX_BLOCK_PLACE_INSIDE, check.getParent().get(CruxBlockComponents.CRUX_BLOCK_PLACE_INSIDE)
+            );
+            if(comp != null && box.contains(pos)){
+                cruxBlockPlaceInside.computeIfAbsent(b, (bb) -> new HashSet<>()).add(check);
+            }
+
+            StructureOuterBoxComponent outerBox = (StructureOuterBoxComponent) check.getParent().get(StructureComponents.OUTER_BOX);
+            if(outerBox == null || !outerBox.disableBlockPlace()) return false;
+            return box.contains(pos);
+        });
+
         StoredStructure stored = CruxCollection.getFirst(module.getStored(check ->{
             StructureOuterBoxComponent outerBox = (StructureOuterBoxComponent) check.getParent().get(StructureComponents.OUTER_BOX);
             if(outerBox == null || !outerBox.disableBlockPlace()) return false;
             BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
             return box.contains(pos);
         }));
-        if (stored == null) return;
+        if(stored == null) return;
+        event.setCancelled(true);
+    }
+
+    public void blockPlace(Block b, BlockPlaceEvent event){
+        CruxWorld crux = CruxCore.core().worldManager().getWorld(b.getWorld().key());
+        if(crux == null) return;
+        StructureWorldModule module = crux.getModule(StructureWorldModule.class);
+        if(module == null) return;
+        Vector pos = b.getLocation().toVector();
+
+        module.getStored(check ->{
+            BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
+            StructureBlockPlaceInsideComponent comp = check.getOrDefault(
+                StructureComponents.BLOCK_PLACE_INSIDE, check.getParent().get(StructureComponents.BLOCK_PLACE_INSIDE)
+            );
+            if(comp != null && box.contains(pos)){
+                blockPlaceInside.computeIfAbsent(b, (bb) -> new HashSet<>()).add(check);
+            }
+
+            StructureOuterBoxComponent outerBox = (StructureOuterBoxComponent) check.getParent().get(StructureComponents.OUTER_BOX);
+            if(outerBox == null || !outerBox.disableBlockPlace()) return false;
+            return box.contains(pos);
+        });
+
+        StoredStructure stored = CruxCollection.getFirst(module.getStored(check ->{
+            StructureOuterBoxComponent outerBox = (StructureOuterBoxComponent) check.getParent().get(StructureComponents.OUTER_BOX);
+            if(outerBox == null || !outerBox.disableBlockPlace()) return false;
+            BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
+            return box.contains(pos);
+        }));
+        if(stored == null) return;
         event.setCancelled(true);
     }
 
