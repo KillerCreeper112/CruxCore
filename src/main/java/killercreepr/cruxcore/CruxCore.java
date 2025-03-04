@@ -10,6 +10,7 @@ import killercreepr.crux.api.data.Reloadable;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
+import killercreepr.crux.api.event.ServerShutDownEvent;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.block.tag.BaseBlockTag;
 import killercreepr.crux.core.communication.lang.SimpleCreateLang;
@@ -87,6 +88,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
@@ -289,14 +291,23 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onServerShutDown(ServerShutDownEvent event) {
+        for(CruxWorld world : worldManager.getWorlds()){
+            try{
+                world.onUnload(true);
+            }catch (Exception ignored){
+                getLogger().severe("ERROR WHILE UNLOADING WORLD: " + world.key());
+                ignored.printStackTrace();
+            }
+        }
+    }
+
+
     @Override
     public void disabled() {
         super.disabled();
         MODULES.unregisterAll(this);
-
-        for(CruxWorld world : worldManager.getWorlds()){
-            world.onUnload(true);
-        }
 
         //structureManager.saveAllWorlds();
     }
