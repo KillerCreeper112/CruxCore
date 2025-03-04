@@ -30,6 +30,7 @@ import killercreepr.cruxstructures.core.structure.component.StoredStructureCompo
 import killercreepr.cruxstructures.core.structure.component.StructureComponents;
 import killercreepr.cruxstructures.core.structure.component.StructureOuterBoxComponent;
 import killercreepr.cruxworlds.api.world.CruxWorld;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -49,6 +50,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StructureListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -78,9 +80,11 @@ public class StructureListener implements Listener {
     protected final Map<Block, Collection<StoredStructure>> cruxBlockPlaceInside = new HashMap<>();
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        if(event.getPlayer().hasPermission("cruxcore.structure.block.place.bypass")) return;
         Block b = event.getBlock();
-        blockPlace(b, event);
+        if(blockPlace(b, event)){
+            if(event.getPlayer().hasPermission("cruxcore.structure.block.place.bypass")) return;
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -103,9 +107,11 @@ public class StructureListener implements Listener {
         //todo may want to possibly allow more miners for the StructureCruxBlockPlace component
         if(!(miner instanceof EntityMiner entityMiner)) return;
         Entity e = entityMiner.getEntity();
-        if(e.hasPermission("cruxcore.structure.block.place.bypass")) return;
         Block b = event.getContext().getBlock();
-        cruxBlockPlace(b, event);
+        if(cruxBlockPlace(b, event)){
+            if(e.hasPermission("cruxcore.structure.block.place.bypass")) return;
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -122,13 +128,14 @@ public class StructureListener implements Listener {
         }
     }
 
-    public void cruxBlockPlace(Block b, CruxBlockPlaceEvent event){
+    public boolean cruxBlockPlace(Block b, CruxBlockPlaceEvent event){
         CruxWorld crux = CruxCore.core().worldManager().getWorld(b.getWorld().key());
-        if(crux == null) return;
+        if(crux == null) return false;
         StructureWorldModule module = crux.getModule(StructureWorldModule.class);
-        if(module == null) return;
+        if(module == null) return false;
         Vector pos = b.getLocation().toVector();
 
+        AtomicBoolean cancel = new AtomicBoolean(false);
         module.getStored(check ->{
             BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
             StructureCruxBlockPlaceInsideComponent comp = check.getOrDefault(
@@ -140,26 +147,30 @@ public class StructureListener implements Listener {
 
             StructureOuterBoxComponent outerBox = (StructureOuterBoxComponent) check.getParent().get(StructureComponents.OUTER_BOX);
             if(outerBox == null || !outerBox.disableBlockPlace()) return false;
-            return box.contains(pos);
+            if(!box.contains(pos)) return false;
+            cancel.set(true);
+            return true;
         });
+        return cancel.get();
 
-        StoredStructure stored = CruxCollection.getFirst(module.getStored(check ->{
+        /*StoredStructure stored = CruxCollection.getFirst(module.getStored(check ->{
             StructureOuterBoxComponent outerBox = (StructureOuterBoxComponent) check.getParent().get(StructureComponents.OUTER_BOX);
             if(outerBox == null || !outerBox.disableBlockPlace()) return false;
             BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
             return box.contains(pos);
         }));
         if(stored == null) return;
-        event.setCancelled(true);
+        event.setCancelled(true);*/
     }
 
-    public void blockPlace(Block b, BlockPlaceEvent event){
+    public boolean blockPlace(Block b, BlockPlaceEvent event){
         CruxWorld crux = CruxCore.core().worldManager().getWorld(b.getWorld().key());
-        if(crux == null) return;
+        if(crux == null) return false;
         StructureWorldModule module = crux.getModule(StructureWorldModule.class);
-        if(module == null) return;
+        if(module == null) return false;
         Vector pos = b.getLocation().toVector();
 
+        AtomicBoolean cancel = new AtomicBoolean(false);
         module.getStored(check ->{
             BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
             StructureBlockPlaceInsideComponent comp = check.getOrDefault(
@@ -171,17 +182,19 @@ public class StructureListener implements Listener {
 
             StructureOuterBoxComponent outerBox = (StructureOuterBoxComponent) check.getParent().get(StructureComponents.OUTER_BOX);
             if(outerBox == null || !outerBox.disableBlockPlace()) return false;
-            return box.contains(pos);
+            if(!box.contains(pos)) return false;
+            cancel.set(true);
+            return true;
         });
 
-        StoredStructure stored = CruxCollection.getFirst(module.getStored(check ->{
+        /*StoredStructure stored = CruxCollection.getFirst(module.getStored(check ->{
             StructureOuterBoxComponent outerBox = (StructureOuterBoxComponent) check.getParent().get(StructureComponents.OUTER_BOX);
             if(outerBox == null || !outerBox.disableBlockPlace()) return false;
             BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
             return box.contains(pos);
         }));
-        if(stored == null) return;
-        event.setCancelled(true);
+        if(stored == null) return false;*/
+        return cancel.get();
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
