@@ -30,7 +30,6 @@ import killercreepr.cruxstructures.core.structure.component.StoredStructureCompo
 import killercreepr.cruxstructures.core.structure.component.StructureComponents;
 import killercreepr.cruxstructures.core.structure.component.StructureOuterBoxComponent;
 import killercreepr.cruxworlds.api.world.CruxWorld;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
