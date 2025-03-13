@@ -48,7 +48,7 @@ public class CruxCoreLimitedRecipeListener extends LimitedAccessRecipeListener i
         new AdvancementMsg()
             .icon(icon)
             .frame(AdvanceFrame.TASK)
-            .title("New Custom Recipe Unlocked!")
+            .title("New Custom Recipe(s) Unlocked!")
             .displayToast(p);
     }
 
