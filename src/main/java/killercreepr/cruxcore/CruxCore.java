@@ -6,11 +6,13 @@ import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
 import killercreepr.crux.api.communication.lang.CreateLang;
 import killercreepr.crux.api.communication.lang.LangProvider;
+import killercreepr.crux.api.data.DataExchange;
 import killercreepr.crux.api.data.Reloadable;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
 import killercreepr.crux.api.event.ServerShutDownEvent;
+import killercreepr.crux.api.valueproviders.number.NumberProvider;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.block.tag.BaseBlockTag;
 import killercreepr.crux.core.communication.lang.SimpleCreateLang;
@@ -45,14 +47,18 @@ import killercreepr.cruxcore.listener.CruxWorldListener;
 import killercreepr.cruxcore.listener.ItemStackListener;
 import killercreepr.cruxcore.listener.PlayerDataListener;
 import killercreepr.cruxcore.listener.StructureListener;
+import killercreepr.cruxcore.menu.StandardCraftingMenuHolder;
+import killercreepr.cruxcore.menu.StandardCraftingRecipeListHolder;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
 import killercreepr.cruxcrafting.api.crafting.CruxCraftingRecipeManager;
 import killercreepr.cruxcrafting.core.CruxCraftingModule;
 import killercreepr.cruxcrafting.core.config.CruxCraftingCfg;
 import killercreepr.cruxcrafting.core.config.loader.CruxCraftingIngredientLoader;
 import killercreepr.cruxcrafting.core.config.loader.CruxCraftingRecipeLoader;
-import killercreepr.cruxcrafting.core.crafting.SimpleCraftingRecipeManager;
+import killercreepr.cruxcrafting.core.crafting.LimitedCraftingRecipeManager;
+import killercreepr.cruxcrafting.core.entity.memory.RecipesHolder;
 import killercreepr.cruxcrafting.core.listener.CraftingListener;
+import killercreepr.cruxcrafting.core.listener.LimitedAccessRecipeListener;
 import killercreepr.cruxcrafting.core.registries.CruxCraftingRegistries;
 import killercreepr.cruxenchants.core.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
@@ -65,6 +71,7 @@ import killercreepr.cruxgeneration.CruxGenerationModule;
 import killercreepr.cruxitems.core.CruxItemsModule;
 import killercreepr.cruxitems.core.registries.CruxItemRegistries;
 import killercreepr.cruxmenus.CruxMenusModule;
+import killercreepr.cruxmenus.api.menu.holder.MenuItems;
 import killercreepr.cruxpotions.CruxPotionsModule;
 import killercreepr.cruxstatistics.core.CruxStatisticsModule;
 import killercreepr.cruxstatistics.core.statistic.PlayerCruxStatisticHolder;
@@ -95,6 +102,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 
 public class CruxCore extends CruxPlugin implements Listener, LangProvider {
@@ -254,14 +263,34 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             mem.getDataHolders().register(new PlayerCruxStatHolder(mem));
             mem.getDataHolders().register(new PlayerBossBarHolder(mem));
             mem.getDataHolders().register(new PlayerCruxStatisticHolder(mem));
+            mem.getDataHolders().register(new RecipesHolder(((LimitedCraftingRecipeManager) craftingManager).getMemoryHolderKey(), mem, craftingManager));
         });
 
         CruxCoreComponents.register();
         CfgCruxCoreComponents.register(BukkitCfgHandlers.TYPED_DATA_COMPONENT.typeHandlers());
+
+        CruxMenusModule menus = cruxMenus();
+        menus.menuRegistry().menuHolders().register(new StandardCraftingMenuHolder(
+            Crux.key("crafting/standard"),
+            "<white><crux_space:-8><font:\"crux:abyss\">2<reset><crux_space:-145>Crafting",
+            NumberProvider.constant(27),
+            MenuItems.items(new TreeMap<>()), DataExchange.empty(), Set.of()
+        ));
+        menus.menuRegistry().menuHolders().register(new StandardCraftingRecipeListHolder(
+            Crux.key("crafting/standard/recipe_list"),
+            "<white><crux_space:-8><font:\"crux:crafting\">1<reset><crux_space:-145>Custom Recipes",
+            NumberProvider.constant(45),
+            MenuItems.items(new TreeMap<>()), DataExchange.single("crafting_recipe_manager", () -> craftingManager), Set.of()
+        ));
     }
     protected LangProvider langProvider;
     protected CruxCoreConfig cfg;
-    protected final CruxCraftingRecipeManager craftingManager = new SimpleCraftingRecipeManager();
+    protected final CruxCraftingRecipeManager craftingManager = CruxCraftingRegistries.RECIPE_MANAGER.register(new LimitedCraftingRecipeManager(Crux.key("standard")));
+
+    public CruxCraftingRecipeManager craftingManager(){
+        return craftingManager;
+    }
+
     @Override
     public void enabled() {
         //enable modules.
@@ -282,7 +311,8 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             new CruxWorldListener(cruxBlocks().getBlockRegistry()),
             new SimpleCruxBlockManager(worldManager),
 
-            new CraftingListener(this, craftingManager)
+            new CraftingListener(this, craftingManager),
+            new LimitedAccessRecipeListener(craftingManager)
         );
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
 
