@@ -43,10 +43,7 @@ import killercreepr.cruxcore.config.handler.FileDynamicItemUpdater;
 import killercreepr.cruxcore.config.handler.FileDynamicUpdater;
 import killercreepr.cruxcore.item.updater.DynamicItemUpdater;
 import killercreepr.cruxcore.item.updater.DynamicUpdater;
-import killercreepr.cruxcore.listener.CruxWorldListener;
-import killercreepr.cruxcore.listener.ItemStackListener;
-import killercreepr.cruxcore.listener.PlayerDataListener;
-import killercreepr.cruxcore.listener.StructureListener;
+import killercreepr.cruxcore.listener.*;
 import killercreepr.cruxcore.menu.StandardCraftingMenuHolder;
 import killercreepr.cruxcore.menu.StandardCraftingRecipeListHolder;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
@@ -312,7 +309,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             new SimpleCruxBlockManager(worldManager),
 
             new CraftingListener(this, craftingManager),
-            new LimitedAccessRecipeListener(craftingManager)
+            new CruxCoreLimitedRecipeListener(craftingManager)
         );
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
 
