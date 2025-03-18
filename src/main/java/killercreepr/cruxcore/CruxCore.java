@@ -85,6 +85,7 @@ import killercreepr.cruxworlds.core.config.loader.NaturalEntityGroupGroupCfgLoad
 import killercreepr.cruxworlds.core.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import net.minecraft.tags.TagLoader;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import org.bukkit.command.Command;
@@ -349,6 +350,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         );
         new EntityTagLoader().loadConfiguration(
             new CruxFolder(this, "tags/entity").file()
+        );
+        new KeyTagLoader().loadConfiguration(
+            new CruxFolder(this, "tags/key").file()
         );
     }
 
