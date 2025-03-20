@@ -30,3 +30,5 @@ dependencies:
     LibsDisguises:
       load: BEFORE
       required: false
+    PlaceholderAPI:
+      required: false

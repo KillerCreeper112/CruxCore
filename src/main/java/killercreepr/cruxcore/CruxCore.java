@@ -55,7 +55,6 @@ import killercreepr.cruxcrafting.core.config.loader.CruxCraftingRecipeLoader;
 import killercreepr.cruxcrafting.core.crafting.LimitedCraftingRecipeManager;
 import killercreepr.cruxcrafting.core.entity.memory.RecipesHolder;
 import killercreepr.cruxcrafting.core.listener.CraftingListener;
-import killercreepr.cruxcrafting.core.listener.LimitedAccessRecipeListener;
 import killercreepr.cruxcrafting.core.registries.CruxCraftingRegistries;
 import killercreepr.cruxenchants.core.CruxEnchantsModule;
 import killercreepr.cruxentities.CruxEntitiesModule;
@@ -85,7 +84,6 @@ import killercreepr.cruxworlds.core.config.loader.NaturalEntityGroupGroupCfgLoad
 import killercreepr.cruxworlds.core.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
-import net.minecraft.tags.TagLoader;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import org.bukkit.command.Command;
