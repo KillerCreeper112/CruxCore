@@ -12,6 +12,8 @@ import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
 import killercreepr.crux.api.event.ServerShutDownEvent;
+import killercreepr.crux.api.text.resolver.StringListResolver;
+import killercreepr.crux.api.text.resolver.StringResolver;
 import killercreepr.crux.api.valueproviders.number.NumberProvider;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.block.tag.BaseBlockTag;
@@ -47,6 +49,8 @@ import killercreepr.cruxcore.listener.*;
 import killercreepr.cruxcore.menu.StandardCraftingMenuHolder;
 import killercreepr.cruxcore.menu.StandardCraftingRecipeListHolder;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
+import killercreepr.cruxcore.text.tags.StringListResolverHolder;
+import killercreepr.cruxcore.text.tags.StringResolverHolder;
 import killercreepr.cruxcrafting.api.crafting.CruxCraftingRecipeManager;
 import killercreepr.cruxcrafting.core.CruxCraftingModule;
 import killercreepr.cruxcrafting.core.config.CruxCraftingCfg;
@@ -96,10 +100,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 
 public class CruxCore extends CruxPlugin implements Listener, LangProvider {
@@ -490,6 +491,14 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         super.reload();
         cfg.setup();
         Crux.debug = cfg.DEBUG.value().value().shortValue();
+        cfg.GLOBAL_STRING_TAGS.valueOr(Map.of()).keySet().forEach(id ->{
+            StringResolver resolver = new StringResolverHolder(id, () -> cfg.GLOBAL_STRING_TAGS.valueOr(Map.of()).get(id));
+            Crux.format().globalStringResolvers().register(resolver);
+        });
+        cfg.GLOBAL_STRING_LIST_TAGS.valueOr(Map.of()).keySet().forEach(id ->{
+            StringListResolver resolver = new StringListResolverHolder(id, () -> cfg.GLOBAL_STRING_LIST_TAGS.valueOr(Map.of()).get(id));
+            Crux.format().globalStringListResolvers().register(resolver);
+        });
         loadTags();
         //langProvider.reload(this);
 
