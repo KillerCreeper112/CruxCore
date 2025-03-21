@@ -133,9 +133,20 @@ public class CruxCoreCommands {
                             String text = ctx.getArgument("text", String.class);
                             Component output = Crux.format().deserialize(text, TagContainer.merged()
                                 .hook(getExecutor(ctx.getSource())));
-                            getExecutor(ctx.getSource()).sendMessage(Component.text("Output: ").append(output)
-                                .clickEvent(ClickEvent.copyToClipboard(PlainTextComponentSerializer.plainText().serialize(output)))
-                                .hoverEvent(HoverEvent.showText(Component.text("Click to copy"))));
+
+                            Component base = Component.empty();
+                            String stringDeserialized = Crux.format().deserializeString(text, TagContainer.merged()
+                                .hook(getExecutor(ctx.getSource())));
+                            if(!stringDeserialized.contains("<click")){
+                                base = base.clickEvent(ClickEvent.copyToClipboard(PlainTextComponentSerializer.plainText().serialize(output)));
+                            }
+                            if(!stringDeserialized.contains("<hover")){
+                                base = base.hoverEvent(HoverEvent.showText(Component.text("Click to copy")));
+                            }
+
+                            getExecutor(ctx.getSource()).sendMessage(Component.text("Output: ").append(
+                                base.append(output)
+                            ));
                             return 1;
                         })
                 )
