@@ -1,5 +1,6 @@
 package killercreepr.cruxcore;
 
+import com.destroystokyo.paper.MaterialTags;
 import com.google.common.reflect.TypeToken;
 import io.papermc.paper.entity.CollarColorable;
 import killercreepr.crux.api.block.CruxedBlock;
@@ -12,6 +13,7 @@ import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
 import killercreepr.crux.api.event.ServerShutDownEvent;
+import killercreepr.crux.api.item.tag.ItemTag;
 import killercreepr.crux.api.text.resolver.StringListResolver;
 import killercreepr.crux.api.text.resolver.StringResolver;
 import killercreepr.crux.api.valueproviders.number.NumberProvider;
@@ -20,6 +22,7 @@ import killercreepr.crux.core.block.tag.BaseBlockTag;
 import killercreepr.crux.core.communication.lang.SimpleCreateLang;
 import killercreepr.crux.core.entity.memory.standard.PlayerBossBarHolder;
 import killercreepr.crux.core.entity.tag.BaseEntityTag;
+import killercreepr.crux.core.item.tag.BaseItemTag;
 import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.plugin.module.CruxMainModule;
 import killercreepr.crux.core.registries.CruxModuleRegistry;
@@ -37,6 +40,7 @@ import killercreepr.cruxconfig.config.bukkit.loader.*;
 import killercreepr.cruxconfig.config.common.file.DataFile;
 import killercreepr.cruxconfig.config.registry.CfgRegistries;
 import killercreepr.cruxcore.command.CruxCoreCommands;
+import killercreepr.cruxcore.command.DevCommands;
 import killercreepr.cruxcore.command.FAWECommands;
 import killercreepr.cruxcore.component.CruxCoreComponents;
 import killercreepr.cruxcore.config.CruxCoreConfig;
@@ -97,6 +101,7 @@ import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
 
@@ -247,6 +252,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
         new CruxCoreCommands(this).register(this);
         new FAWECommands(this).register(this);
+        new DevCommands(this).register(this);
         new CruxWorldsCommands("cruxworld", "crux.cmds.cruxworld.use", List.of("cworld"), worldManager).register(this);
 
         super.onLoad();
@@ -468,6 +474,61 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
                 return block.getBlock().isBurnable();
             }
         });
+
+        registerItemTag(new BaseItemTag(Key.key("pickaxes")) {
+            @Override
+            public boolean isTagged(@NotNull ItemStack item) {
+                return MaterialTags.PICKAXES.isTagged(item);
+            }
+        });
+        registerItemTag(new BaseItemTag(Key.key("axes")) {
+            @Override
+            public boolean isTagged(@NotNull ItemStack item) {
+                return MaterialTags.AXES.isTagged(item);
+            }
+        });
+        registerItemTag(new BaseItemTag(Key.key("shovels")) {
+            @Override
+            public boolean isTagged(@NotNull ItemStack item) {
+                return MaterialTags.SHOVELS.isTagged(item);
+            }
+        });
+        registerItemTag(new BaseItemTag(Key.key("swords")) {
+            @Override
+            public boolean isTagged(@NotNull ItemStack item) {
+                return MaterialTags.SWORDS.isTagged(item);
+            }
+        });
+        registerItemTag(new BaseItemTag(Key.key("hoes")) {
+            @Override
+            public boolean isTagged(@NotNull ItemStack item) {
+                return MaterialTags.HOES.isTagged(item);
+            }
+        });
+        registerItemTag(new BaseItemTag(Key.key("helmets")) {
+            @Override
+            public boolean isTagged(@NotNull ItemStack item) {
+                return MaterialTags.HELMETS.isTagged(item);
+            }
+        });
+        registerItemTag(new BaseItemTag(Key.key("chestplates")) {
+            @Override
+            public boolean isTagged(@NotNull ItemStack item) {
+                return MaterialTags.CHESTPLATES.isTagged(item);
+            }
+        });
+        registerItemTag(new BaseItemTag(Key.key("leggings")) {
+            @Override
+            public boolean isTagged(@NotNull ItemStack item) {
+                return MaterialTags.LEGGINGS.isTagged(item);
+            }
+        });
+        registerItemTag(new BaseItemTag(Key.key("boots")) {
+            @Override
+            public boolean isTagged(@NotNull ItemStack item) {
+                return MaterialTags.BOOTS.isTagged(item);
+            }
+        });
     }
 
     private void registerEntityTag(EntityTag tag){
@@ -478,6 +539,11 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     private void registerBlockTag(BlockTag tag){
         CruxRegistries.BLOCK_TAG.register(tag);
         Crux.log(Level.INFO, "Registered built-in block tag: " + tag.key());
+    }
+
+    private void registerItemTag(ItemTag tag){
+        CruxRegistries.ITEM_TAG.register(tag);
+        Crux.log(Level.INFO, "Registered built-in item tag: " + tag.key());
     }
 
     public void loadBlockSoundGroups(){
