@@ -9,14 +9,20 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import killercreepr.crux.api.item.CruxItem;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.data.util.MapBuilder;
 import killercreepr.crux.core.plugin.CruxPlugin;
+import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
 import killercreepr.cruxconfig.config.bukkit.file.CruxJson;
 import killercreepr.cruxconfig.config.common.element.FileArray;
 import killercreepr.cruxconfig.config.common.element.FileObject;
 import killercreepr.cruxcore.CruxCore;
+import killercreepr.cruxitems.core.registries.CruxItemRegistries;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -34,8 +40,8 @@ public class DevCommands {
     public void register(@NotNull CruxPlugin plugin){
         plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event ->{
             final Commands commands = event.registrar();
-            LiteralCommandNode<CommandSourceStack> cmd = build(Commands.literal("filedev")
-                .requires(source -> source.getSender().hasPermission("cruxcore.cmds.filedev.use")),
+            LiteralCommandNode<CommandSourceStack> cmd = build(Commands.literal("cdev")
+                .requires(source -> source.getSender().hasPermission("cruxcore.cmds.cdev.use")),
                 plugin.getLifecycleManager());
             commands.register(cmd);
         });
@@ -45,8 +51,9 @@ public class DevCommands {
         .put("generated", new Generated())
         .put("handheld", new HandHeld())
         .put("bow", new Bow())
-        .put("crossbowbow", new Crossbow())
+        .put("crossbow", new Crossbow())
         .put("fishing_rod", new FishingRod())
+        .put("charm_skins", new CharmSkins())
         .build();
     public LiteralCommandNode<CommandSourceStack> build(LiteralArgumentBuilder<CommandSourceStack> dispatcher,
                                                                   LifecycleEventManager<?> manager){
@@ -71,10 +78,9 @@ public class DevCommands {
                                     Commands.argument("args", StringArgumentType.greedyString())
                                         .suggests((d, e) ->{
                                             List.of(
-                                                "skin",
-                                                "tools",
-                                                "armor"
+                                                "skin"
                                             ).forEach(e::suggest);
+                                            uniqueArgs.forEach(e::suggest);
                                             return e.buildFuture();
                                         })
                                         .executes(ctx ->{
@@ -88,30 +94,86 @@ public class DevCommands {
                                 )
                         )
                 )
+        ).then(
+            Commands.literal("give")
+                .then(
+                    Commands.argument("name", StringArgumentType.string())
+                        .then(
+                            Commands.argument("args", StringArgumentType.greedyString())
+                                .suggests((d, e) ->{
+                                    uniqueArgs.forEach(e::suggest);
+                                    return e.buildFuture();
+                                })
+                                .executes(ctx ->{
+                                    if(!(getExecutor(ctx.getSource()) instanceof Player p)) return -1;
+
+                                    String[] argsSplit = ctx.getArgument("args", String.class).split(",");
+                                    Collection<String> args = new HashSet<>(List.of(argsSplit));
+                                    String name = ctx.getArgument("name", String.class);
+                                    Collection<String> names = getNames(args, name);
+                                    names.add(name);
+                                    for(String s : names){
+                                        Material type;
+                                        if(s.endsWith("_bow")){
+                                            type = Material.BOW;
+                                        }else if(s.endsWith("_crossbow")){
+                                            type = Material.CROSSBOW;
+                                        }else if(s.endsWith("_fishing_rod")){
+                                            type = Material.FISHING_ROD;
+                                        }else type = Material.PAPER;
+
+                                        ItemStack item = CruxItem.create(type)
+                                            .itemModel(Crux.key(s))
+                                            .customName(Crux.key(s).asString())
+                                            .item();
+                                        p.getInventory().addItem(item);
+                                    }
+                                    return 1;
+                                })
+                        )
+                )
         )
         ;
         return dispatcher.build();
     }
 
+    private Collection<String> getNames(Collection<String> args, String name){
+        Collection<String> list = new HashSet<>();
+        if(args.contains("tools") || args.contains("tools_all")){
+            for(String s : List.of("pickaxe", "axe", "shovel", "hoe", "sword")){
+                list.add(name + s);
+            }
+        }
+        if(args.contains("armor") || args.contains("armor_all")){
+            for(String s : List.of("helmet", "chestplate", "leggings", "boots")){
+                list.add(name + s);
+            }
+        }
+        if(args.contains("armor_all")){
+            for(String s : List.of("elytra")){
+                list.add(name + s);
+            }
+        }
+        if(args.contains("tools_all")){
+            for(String s : List.of("mace")){
+                list.add(name + s);
+            }
+        }
+        return list;
+    }
+
+    protected final Collection<String> uniqueArgs = Set.of("tools", "armor", "armor_all", "tools_all");
     private void onCMD(Collection<String> args, String name, Generation generation){
         boolean x = false;
-        if(args.contains("tools")){
-            args.remove("tools");
-            args.remove("armor");
-            for(String s : List.of("pickaxe", "axe", "shovel", "hoe", "sword")){
-                onCMD(args, name + s, generation);
+
+        Collection<String> names = getNames(args, name);
+        if(!names.isEmpty()){
+            args.removeAll(uniqueArgs);
+            for(String s : names){
+                onCMD(args, s, generation);
             }
-             x= true;
+            return;
         }
-        if(args.contains("armor")){
-            args.remove("armor");
-            args.remove("tools");
-            for(String s : List.of("helmet", "chestplate", "leggings", "boots")){
-                onCMD(args, name + s, generation);
-            }
-            x = true;
-        }
-        if(x) return;
 
         generation.generate(name);
 
@@ -205,7 +267,7 @@ public class DevCommands {
             "type": "minecraft:condition",
             "on_false": {
               "type": "minecraft:model",
-              "model": "crux:item/%s"
+              "model": "%s"
             },
             "on_true": {
               "type": "minecraft:range_dispatch",
@@ -237,11 +299,12 @@ public class DevCommands {
         }
         """, Crux.key(name).asString(), pulling1, pulling2, pulling0);
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().create();
 
+            var fileJson = new CruxJson(CruxCore.core(), "dev/generated/items/" + parseName(name), false);
             try {
                 // Ensure the directory exists
-                File file = new CruxJson(CruxCore.core(), "dev/generated/items/" + parseName(name), false).file();
+                File file = fileJson.file();
                 file.getParentFile().mkdirs();
 
                 // Write to the file
@@ -251,6 +314,7 @@ public class DevCommands {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            fileJson.close();
         }
     }
 
@@ -345,11 +409,12 @@ public class DevCommands {
                 }
         """, arrow, firework, Crux.key(name).asString(), pulling1, pulling2, pulling0);
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().create();
 
+            CruxJson fileJson = new CruxJson(CruxCore.core(), "dev/generated/items/" + parseName(name), false);
             try {
                 // Ensure the directory exists
-                File file = new CruxJson(CruxCore.core(), "dev/generated/items/" + parseName(name), false).file();
+                File file = fileJson.file();
                 file.getParentFile().mkdirs();
 
                 // Write to the file
@@ -359,8 +424,30 @@ public class DevCommands {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            fileJson.close();
         }
     }
+
+    private static class CharmSkins extends Generation{
+        @Override
+        public void generate(String name) {
+            CruxConfig cfg = new CruxConfig(CruxCore.core(), "dev/generated/charm/skins");
+            FileArray a;
+            if(cfg.getElement("values") instanceof FileArray aa) a = aa;
+            else a = new FileArray();
+
+            String parsed = parseName(name);
+            String[] args = parsed.split("_");
+            String end = args[args.length-1];
+            String tag = end;
+            if(!end.endsWith("s")) tag = tag + "s";
+            a.add(new FileObject().addProperty("item_model", "skin/" + parsed)
+                .addProperty("filter", "#" + tag));
+            cfg.set("values", a);
+            cfg.save();
+        }
+    }
+
     private static class FishingRod extends Generation{
         @Override
         public void generate(String name) {
@@ -391,11 +478,12 @@ public class DevCommands {
                         }
         """, Crux.key(name).asString(), Crux.key(name) + "_cast");
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().create();
 
+            var fileJson = new CruxJson(CruxCore.core(), "dev/generated/items/" + parseName(name), false);
             try {
                 // Ensure the directory exists
-                File file = new CruxJson(CruxCore.core(), "dev/generated/items/" + parseName(name), false).file();
+                File file = fileJson.file();
                 file.getParentFile().mkdirs();
 
                 // Write to the file
@@ -405,6 +493,7 @@ public class DevCommands {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            fileJson.close();
         }
     }
 }
