@@ -1,6 +1,7 @@
 package killercreepr.cruxcore.command;
 
 import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -11,6 +12,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import killercreepr.crux.api.communication.CreateSound;
 import killercreepr.crux.api.communication.CreateTitle;
 import killercreepr.crux.api.plugin.module.CruxModule;
 import killercreepr.crux.api.text.tags.container.TagContainer;
@@ -20,10 +22,14 @@ import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.util.CruxMath;
 import killercreepr.crux.core.util.CruxString;
 import killercreepr.cruxcore.CruxCore;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Registry;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -230,6 +236,74 @@ public class CruxCoreCommands {
 
                                     return 1;
                                 })
+                        )
+                )
+        ).then(
+            Commands.literal("playsound")
+                .then(
+                    Commands.argument("targets", ArgumentTypes.players())
+                        .then(
+                            Commands.argument("sound", ArgumentTypes.key())
+                                .suggests((ctx, builder) ->{
+                                    for (Sound sound : Registry.SOUNDS) {
+                                        if(!(sound instanceof Keyed k)) continue;
+                                        builder.suggest(k.key().asString());
+                                    }
+                                    return builder.buildFuture();
+                                })
+                                .executes(ctx ->{
+                                    Collection<Player> targets = ctx.getArgument("targets", PlayerSelectorArgumentResolver.class)
+                                        .resolve(ctx.getSource());
+                                    Key sound = ctx.getArgument("sound", Key.class);
+
+                                    for(Player p : targets){
+                                        CreateSound.sound(sound).playFor(p);
+                                    }
+
+                                    getExecutor(ctx.getSource()).sendMessage(
+                                        Component.text("Played sound " + sound + " to " + targets.size() + " players.")
+                                    );
+
+                                    return 1;
+                                })
+                                .then(
+                                    Commands.argument("volume", FloatArgumentType.floatArg())
+                                        .executes(ctx ->{
+                                            Collection<Player> targets = ctx.getArgument("targets", PlayerSelectorArgumentResolver.class)
+                                                .resolve(ctx.getSource());
+                                            Key sound = ctx.getArgument("sound", Key.class);
+                                            float volume = ctx.getArgument("volume", Float.class);
+
+                                            for(Player p : targets){
+                                                CreateSound.sound(sound, net.kyori.adventure.sound.Sound.Source.MASTER, volume, 1f).playFor(p);
+                                            }
+
+                                            getExecutor(ctx.getSource()).sendMessage(
+                                                Component.text("Played sound " + sound + " to " + targets.size() + " players.")
+                                            );
+
+                                            return 1;
+                                        }).then(
+                                            Commands.argument("pitch", FloatArgumentType.floatArg())
+                                                .executes(ctx ->{
+                                                    Collection<Player> targets = ctx.getArgument("targets", PlayerSelectorArgumentResolver.class)
+                                                        .resolve(ctx.getSource());
+                                                    Key sound = ctx.getArgument("sound", Key.class);
+                                                    float volume = ctx.getArgument("volume", Float.class);
+                                                    float pitch = ctx.getArgument("pitch", Float.class);
+
+                                                    for(Player p : targets){
+                                                        CreateSound.sound(sound, net.kyori.adventure.sound.Sound.Source.MASTER, volume, pitch).playFor(p);
+                                                    }
+
+                                                    getExecutor(ctx.getSource()).sendMessage(
+                                                        Component.text("Played sound " + sound + " to " + targets.size() + " players.")
+                                                    );
+
+                                                    return 1;
+                                                })
+                                        )
+                                )
                         )
                 )
         ).then(
