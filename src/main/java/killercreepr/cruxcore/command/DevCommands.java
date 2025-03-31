@@ -54,6 +54,7 @@ public class DevCommands {
         .put("crossbow", new Crossbow())
         .put("fishing_rod", new FishingRod())
         .put("charm_skins", new CharmSkins())
+        .put("custom", new Custom())
         .build();
     public LiteralCommandNode<CommandSourceStack> build(LiteralArgumentBuilder<CommandSourceStack> dispatcher,
                                                                   LifecycleEventManager<?> manager){
@@ -69,9 +70,12 @@ public class DevCommands {
                         .then(
                             Commands.argument("name", StringArgumentType.string())
                                 .executes(ctx ->{
-                                    Generation generation = generations.get(ctx.getArgument("type", String.class));
+                                    String type = ctx.getArgument("type", String.class);
+                                    Generation generation = generations.get(type);
+                                    if(generation == null) generation = generations.get("custom");
                                     String name = ctx.getArgument("name", String.class);
-                                    generation.generate(name);
+                                    if(generation instanceof Custom c) c.generate(name, type);
+                                    else generation.generate(name);
                                     return 1;
                                 })
                                 .then(
@@ -206,6 +210,9 @@ public class DevCommands {
         public void generate(String name){
 
         }
+        public void generate(String name, String custom){
+
+        }
     }
 
     private static class Generated extends Generation{
@@ -213,6 +220,21 @@ public class DevCommands {
         public void generate(String name) {
             CruxJson json = new CruxJson(CruxCore.core(), "dev/generated/models/" + parseName(name));
             json.serialize("parent", "minecraft:item/generated");
+            json.serialize("textures", new FileObject().addProperty("layer0", Crux.key(name).asString()));
+            json.save();
+
+            json = new CruxJson(CruxCore.core(), "dev/generated/items/" + parseName(name));
+            json.serialize("model", new FileObject().addProperty("type", "model")
+                .addProperty("model", Crux.key(name).asString()));
+            json.save();
+        }
+    }
+
+    private static class Custom extends Generation{
+        @Override
+        public void generate(String name, String custom) {
+            CruxJson json = new CruxJson(CruxCore.core(), "dev/generated/models/" + parseName(name));
+            json.serialize("parent", custom);
             json.serialize("textures", new FileObject().addProperty("layer0", Crux.key(name).asString()));
             json.save();
 
