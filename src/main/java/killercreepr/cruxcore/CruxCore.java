@@ -28,6 +28,9 @@ import killercreepr.crux.core.plugin.module.CruxMainModule;
 import killercreepr.crux.core.registries.CruxModuleRegistry;
 import killercreepr.crux.core.registries.CruxRegistries;
 import killercreepr.cruxadvancements.core.CruxAdvancementsModule;
+import killercreepr.cruxadvancements.core.config.CruxAdvanceCfgData;
+import killercreepr.cruxadvancements.core.config.handler.FileAdvancementObjective;
+import killercreepr.cruxadvancements.crazy.config.CfgCrazyAdvancementManager;
 import killercreepr.cruxattributes.core.CruxAttributesModule;
 import killercreepr.cruxblocks.core.CruxBlocksModule;
 import killercreepr.cruxblocks.core.block.manager.SimpleCruxBlockManager;
@@ -43,6 +46,7 @@ import killercreepr.cruxcore.command.CruxCoreCommands;
 import killercreepr.cruxcore.command.DevCommands;
 import killercreepr.cruxcore.command.FAWECommands;
 import killercreepr.cruxcore.component.CruxCoreComponents;
+import killercreepr.cruxcore.config.AdvancementObjectiveCfg;
 import killercreepr.cruxcore.config.CruxCoreConfig;
 import killercreepr.cruxcore.config.component.CfgCruxCoreComponents;
 import killercreepr.cruxcore.config.handler.FileDynamicItemUpdater;
@@ -290,6 +294,8 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             NumberProvider.constant(45),
             MenuItems.items(new TreeMap<>()), DataExchange.single("crafting_recipe_manager", () -> craftingManager), Set.of()
         ));
+
+        AdvancementObjectiveCfg.registerObjectives(CruxAdvanceCfgData.fileAdvancementObjective());
     }
     protected LangProvider langProvider;
     protected CruxCoreConfig cfg;
