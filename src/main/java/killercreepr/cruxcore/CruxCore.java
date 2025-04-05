@@ -29,8 +29,6 @@ import killercreepr.crux.core.registries.CruxModuleRegistry;
 import killercreepr.crux.core.registries.CruxRegistries;
 import killercreepr.cruxadvancements.core.CruxAdvancementsModule;
 import killercreepr.cruxadvancements.core.config.CruxAdvanceCfgData;
-import killercreepr.cruxadvancements.core.config.handler.FileAdvancementObjective;
-import killercreepr.cruxadvancements.crazy.config.CfgCrazyAdvancementManager;
 import killercreepr.cruxattributes.core.CruxAttributesModule;
 import killercreepr.cruxblocks.core.CruxBlocksModule;
 import killercreepr.cruxblocks.core.block.manager.SimpleCruxBlockManager;
@@ -98,7 +96,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Animals;
@@ -106,11 +103,7 @@ import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Merchant;
-import org.bukkit.inventory.MerchantInventory;
-import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
 
@@ -297,7 +290,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
         AdvancementObjectiveCfg.registerObjectives(CruxAdvanceCfgData.fileAdvancementObjective());
     }
-    protected LangProvider langProvider;
+    //protected LangProvider langProvider;
     protected CruxCoreConfig cfg;
     protected final CruxCraftingRecipeManager craftingManager = CruxCraftingRegistries.RECIPE_MANAGER.register(new LimitedCraftingRecipeManager(Crux.key("standard")));
 
