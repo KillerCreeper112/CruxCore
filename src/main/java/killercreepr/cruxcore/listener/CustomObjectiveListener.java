@@ -2,8 +2,12 @@ package killercreepr.cruxcore.listener;
 
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.cruxadvancements.core.entity.memory.AdvancementHolder;
+import killercreepr.cruxcore.advancement.objective.DamageByProxyObjective;
+import killercreepr.cruxcore.advancement.objective.KillByProxyObjective;
 import killercreepr.cruxcore.advancement.objective.StructureEnterObjective;
 import killercreepr.cruxcore.advancement.objective.StructureLeaveObjective;
+import killercreepr.cruxcore.api.event.EntityDamageByOwnerEvent;
+import killercreepr.cruxcore.api.event.EntityDeathByOwnerEvent;
 import killercreepr.cruxcore.api.event.PlayerEnterStructureEvent;
 import killercreepr.cruxcore.api.event.PlayerLeaveStructureEvent;
 import org.bukkit.entity.Entity;
@@ -37,6 +41,33 @@ public class CustomObjectiveListener implements Listener {
             objective.trigger(p.getUniqueId(), manager, advancement, event);
         });
     }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityDamageByOwner(EntityDamageByOwnerEvent event) {
+        var p = event.getOwner();
+        AdvancementHolder holder = holder(p);
+        if(holder==null) return;
+
+        holder.getAdvancementTracker().apply(DamageByProxyObjective.class, (manager,
+                                                                            advancement,
+                                                                            objective) -> {
+            objective.trigger(p.getUniqueId(), manager, advancement, event);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityDeathByOwner(EntityDeathByOwnerEvent event) {
+        var p = event.getOwner();
+        AdvancementHolder holder = holder(p);
+        if(holder==null) return;
+
+        holder.getAdvancementTracker().apply(KillByProxyObjective.class, (manager,
+                                                                          advancement,
+                                                                          objective) -> {
+            objective.trigger(p.getUniqueId(), manager, advancement, event);
+        });
+    }
+
 
     public AdvancementHolder holder(Entity e){
         return EntityMemory.getOrCreateDataHolder(e, AdvancementHolder.class);
