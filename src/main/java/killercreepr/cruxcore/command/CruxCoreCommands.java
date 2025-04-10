@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class CruxCoreCommands {
     protected final @NotNull CruxCore plugin;
@@ -103,6 +104,19 @@ public class CruxCoreCommands {
                                     return 1;
                                 })
                         )
+                )
+        ).then(
+            Commands.literal("uuid")
+                .then(
+                    Commands.argument("name", StringArgumentType.greedyString())
+                        .executes(ctx ->{
+                            var sender = getExecutor(ctx.getSource());
+                            var name = ctx.getArgument("name", String.class);
+                            UUID uuid = plugin.getServer().getOfflinePlayer(name).getUniqueId();
+                            sender.sendMessage(Component.text("UUID for " + name + " is: " + uuid)
+                                .clickEvent(ClickEvent.copyToClipboard(uuid.toString())));
+                            return 1;
+                        })
                 )
         ).then(
             Commands.literal("latinfont")
