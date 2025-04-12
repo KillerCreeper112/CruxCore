@@ -27,6 +27,7 @@ import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.plugin.module.CruxMainModule;
 import killercreepr.crux.core.registries.CruxModuleRegistry;
 import killercreepr.crux.core.registries.CruxRegistries;
+import killercreepr.crux.core.util.CruxWorldUtil;
 import killercreepr.cruxadvancements.core.CruxAdvancementsModule;
 import killercreepr.cruxadvancements.core.config.CruxAdvanceCfgData;
 import killercreepr.cruxattributes.core.CruxAttributesModule;
@@ -320,10 +321,13 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
             new CraftingListener(this, craftingManager),
             new CruxCoreLimitedRecipeListener(craftingManager),
-            new CustomEventListener()
+            new CustomEventListener(),
+            new CustomObjectiveListener()
         );
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
-
+        getServer().getScheduler().runTaskLater(this, () ->{
+            cfg.AUTO_LOAD_WORLDS.valueOr(List.of()).forEach(CruxWorldUtil::getOrLoadWorld);
+        }, 5L);
         //LANG = new SimpleCreateLang();
         //langProvider = new SimpleLangConfig(this, "lang", this::lang, Object.class);
         //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
