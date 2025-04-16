@@ -7,6 +7,7 @@ import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
 import killercreepr.crux.api.communication.lang.CreateLang;
 import killercreepr.crux.api.communication.lang.LangProvider;
+import killercreepr.crux.api.data.AutoSavable;
 import killercreepr.crux.api.data.DataExchange;
 import killercreepr.crux.api.data.Loadable;
 import killercreepr.crux.api.data.Reloadable;
@@ -341,6 +342,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
                 data.getDataHolders().forEach(holder ->{
                     if(holder instanceof Loadable l) l.save();
                 });
+            }
+            for(var plugin : CruxRegistries.PLUGIN){
+                if(plugin instanceof AutoSavable auto) auto.save();
             }
         }, period, period);
 
