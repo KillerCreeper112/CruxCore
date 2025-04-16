@@ -8,6 +8,7 @@ import killercreepr.crux.api.block.tag.BlockTag;
 import killercreepr.crux.api.communication.lang.CreateLang;
 import killercreepr.crux.api.communication.lang.LangProvider;
 import killercreepr.crux.api.data.DataExchange;
+import killercreepr.crux.api.data.Loadable;
 import killercreepr.crux.api.data.Reloadable;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
@@ -97,11 +98,13 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
+import org.bukkit.Tag;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -328,6 +331,19 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         getServer().getScheduler().runTaskLater(this, () ->{
             cfg.AUTO_LOAD_WORLDS.valueOr(List.of()).forEach(CruxWorldUtil::getOrLoadWorld);
         }, 5L);
+
+        long period = 1200 * 10;
+        getServer().getScheduler().runTaskTimer(this, () ->{
+            getLogger().info("Saving all player data!");
+            for (Player p : getServer().getOnlinePlayers()) {
+                PlayerMemory data = PlayerMemory.get(p);
+                if(data == null) continue;
+                data.getDataHolders().forEach(holder ->{
+                    if(holder instanceof Loadable l) l.save();
+                });
+            }
+        }, period, period);
+
         //LANG = new SimpleCreateLang();
         //langProvider = new SimpleLangConfig(this, "lang", this::lang, Object.class);
         //structureManager.buildRunnable().runTaskTimerAsynchronously(this, 20L, 1L);
