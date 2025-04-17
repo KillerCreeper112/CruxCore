@@ -2,7 +2,9 @@ package killercreepr.cruxcore;
 
 import com.destroystokyo.paper.MaterialTags;
 import com.google.common.reflect.TypeToken;
+import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.entity.CollarColorable;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
 import killercreepr.crux.api.communication.lang.CreateLang;
@@ -42,6 +44,7 @@ import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
 import killercreepr.cruxconfig.config.bukkit.loader.*;
 import killercreepr.cruxconfig.config.common.file.DataFile;
+import killercreepr.cruxconfig.config.common.handler.AutoFileHandler;
 import killercreepr.cruxconfig.config.registry.CfgRegistries;
 import killercreepr.cruxcore.command.CruxCoreCommands;
 import killercreepr.cruxcore.command.DevCommands;
@@ -50,6 +53,7 @@ import killercreepr.cruxcore.component.CruxCoreComponents;
 import killercreepr.cruxcore.config.AdvancementObjectiveCfg;
 import killercreepr.cruxcore.config.CruxCoreConfig;
 import killercreepr.cruxcore.config.component.CfgCruxCoreComponents;
+import killercreepr.cruxcore.config.data.CfgCmdMenu;
 import killercreepr.cruxcore.config.handler.FileDynamicItemUpdater;
 import killercreepr.cruxcore.config.handler.FileDynamicUpdater;
 import killercreepr.cruxcore.item.updater.DynamicItemUpdater;
@@ -266,6 +270,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         CfgRegistries.SIMPLE_REGISTRY.forEach(reg ->{
             reg.registerFileHandler(DynamicUpdater.class, new FileDynamicUpdater());
             reg.registerFileHandler(DynamicItemUpdater.class, new FileDynamicItemUpdater());
+            reg.registerFileHandler(new AutoFileHandler<>(CfgCmdMenu.class));
         });
 
         EntityMemory.registerFunction(this, (m) ->{
@@ -347,6 +352,26 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
                 if(plugin instanceof AutoSavable auto) auto.save();
             }
         }, period, period);
+
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, (reg) ->{
+            cfg.CMD_MENUS.valueOr(List.of()).forEach(cmd ->{
+                var builder = Commands.literal(cmd.cmd())
+                    .executes(ctx ->{
+                        if(!(CruxCoreCommands.getExecutor(ctx.getSource()) instanceof Player p)) return -1;
+                        var holder = cruxMenus().menuRegistry().menuHolders().get(cmd.menu());
+                        if(holder == null){
+                            p.sendMessage("Menu " + cmd.menu() + " not found. Contact a developer.");
+                            return 0;
+                        }
+                        holder.open(p);
+                        return 1;
+                    });
+                if(cmd.permission() != null) builder.requires(ctx -> ctx.getSender().hasPermission(cmd.permission()));
+                if(cmd.aliases() != null && !cmd.aliases().isEmpty()){
+                    reg.registrar().register(builder.build(), cmd.aliases());
+                }else reg.registrar().register(builder.build());
+            });
+        });
 
         //LANG = new SimpleCreateLang();
         //langProvider = new SimpleLangConfig(this, "lang", this::lang, Object.class);

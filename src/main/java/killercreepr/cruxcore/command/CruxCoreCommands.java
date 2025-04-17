@@ -359,7 +359,7 @@ public class CruxCoreCommands {
         return dispatcher.build();
     }
 
-    public @NotNull CommandSender getExecutor(@NotNull CommandSourceStack source) {
+    public static @NotNull CommandSender getExecutor(@NotNull CommandSourceStack source) {
         return Objects.requireNonNullElse(source.getExecutor(), source.getSender());
     }
 
