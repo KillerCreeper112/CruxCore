@@ -85,7 +85,7 @@ import killercreepr.cruxitems.core.CruxItemsModule;
 import killercreepr.cruxitems.core.registries.CruxItemRegistries;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxmenus.api.menu.holder.MenuItems;
-import killercreepr.cruxpotions.CruxPotionsModule;
+import killercreepr.cruxpotions.core.CruxPotionsModule;
 import killercreepr.cruxstatistics.core.CruxStatisticsModule;
 import killercreepr.cruxstatistics.core.statistic.PlayerCruxStatisticHolder;
 import killercreepr.cruxstats.core.CruxStatsModule;
