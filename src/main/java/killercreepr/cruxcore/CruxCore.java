@@ -61,6 +61,7 @@ import killercreepr.cruxcore.item.updater.DynamicUpdater;
 import killercreepr.cruxcore.listener.*;
 import killercreepr.cruxcore.menu.StandardCraftingMenuHolder;
 import killercreepr.cruxcore.menu.StandardCraftingRecipeListHolder;
+import killercreepr.cruxcore.recipes.BrewingRecipeLoader;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
 import killercreepr.cruxcore.text.tags.StringListResolverHolder;
 import killercreepr.cruxcore.text.tags.StringResolverHolder;
@@ -671,6 +672,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
         new CraftingRecipeLoader().load(
             new CruxConfig(this, "crafting_recipes"), getServer()
+        );
+        new BrewingRecipeLoader().load(
+            new CruxConfig(this, "brewing_recipes"), getServer()
         );
 
         new CruxCraftingIngredientLoader(CruxCraftingCfg.FILE_CRUX_RECIPE_INGREDIENT, ingredient ->{

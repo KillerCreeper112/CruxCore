@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -27,6 +28,11 @@ public class ItemStackListener implements Listener {
             if(item==null) return;
             Crux.handlers().item().update(item, p);
         });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBrew(BrewEvent event) {
+        event.getResults().forEach(item -> Crux.handlers().item().update(item));
     }
 
     /*@EventHandler(ignoreCancelled = true)
