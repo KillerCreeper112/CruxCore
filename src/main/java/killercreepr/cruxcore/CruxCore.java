@@ -673,9 +673,11 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         new CraftingRecipeLoader().load(
             new CruxConfig(this, "crafting_recipes"), getServer()
         );
-        new BrewingRecipeLoader().load(
-            new CruxConfig(this, "brewing_recipes"), getServer()
-        );
+        Crux.scheduler().runTaskLater(() ->{
+            new BrewingRecipeLoader().load(
+                new CruxConfig(this, "brewing_recipes"), getServer()
+            );
+        }, 100L);
 
         new CruxCraftingIngredientLoader(CruxCraftingCfg.FILE_CRUX_RECIPE_INGREDIENT, ingredient ->{
             CruxCraftingRegistries.RECIPE_INGREDIENT.register(ingredient);
