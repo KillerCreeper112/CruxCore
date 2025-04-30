@@ -104,13 +104,9 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
-import org.bukkit.Tag;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Boss;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -308,7 +304,6 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     public CruxCraftingRecipeManager craftingManager(){
         return craftingManager;
     }
-
     @Override
     public void enabled() {
         //enable modules.
@@ -482,6 +477,13 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             @Override
             public boolean isTagged(@NotNull Entity entity) {
                 return CruxMob.isInCategory(entity, MobCategory.ANIMAL);
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("mob")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                if(!(entity instanceof Mob)) return false;
+                return !CruxMob.isInCategory(entity, MobCategory.OBJECT, MobCategory.COSMETIC);
             }
         });
         for(MobCategory category : CruxEntityRegistries.MOB_CATEGORY){

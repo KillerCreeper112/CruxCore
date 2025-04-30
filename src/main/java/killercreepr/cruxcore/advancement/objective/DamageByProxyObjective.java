@@ -5,7 +5,6 @@ import killercreepr.crux.api.loot.LootContext;
 import killercreepr.cruxadvancements.core.advancement.objective.ObjectiveCommonData;
 import killercreepr.cruxadvancements.core.advancement.objective.standard.GenericEventObjective;
 import killercreepr.cruxcore.api.event.EntityDamageByOwnerEvent;
-import killercreepr.cruxcore.api.event.PlayerEnterStructureEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class DamageByProxyObjective extends GenericEventObjective<EntityDamageByOwnerEvent> {

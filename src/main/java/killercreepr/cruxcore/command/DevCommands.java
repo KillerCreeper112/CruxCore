@@ -18,7 +18,6 @@ import killercreepr.cruxconfig.config.bukkit.file.CruxJson;
 import killercreepr.cruxconfig.config.common.element.FileArray;
 import killercreepr.cruxconfig.config.common.element.FileObject;
 import killercreepr.cruxcore.CruxCore;
-import killercreepr.cruxitems.core.registries.CruxItemRegistries;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
