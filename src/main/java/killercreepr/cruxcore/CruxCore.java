@@ -65,6 +65,7 @@ import killercreepr.cruxcore.recipes.BrewingRecipeLoader;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
 import killercreepr.cruxcore.text.tags.StringListResolverHolder;
 import killercreepr.cruxcore.text.tags.StringResolverHolder;
+import killercreepr.cruxcore.text.tags.object.BrewingDisplayMixTags;
 import killercreepr.cruxcrafting.api.crafting.CruxCraftingRecipeManager;
 import killercreepr.cruxcrafting.core.CruxCraftingModule;
 import killercreepr.cruxcrafting.core.config.CruxCraftingCfg;
@@ -278,6 +279,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             mem.getDataHolders().register(new RecipesHolder(((LimitedCraftingRecipeManager) craftingManager).getMemoryHolderKey(), mem, craftingManager));
         });
 
+        Crux.tags().register(
+            new BrewingDisplayMixTags()
+        );
         CruxCoreComponents.register();
         CfgCruxCoreComponents.register(BukkitCfgHandlers.TYPED_DATA_COMPONENT.typeHandlers());
 
@@ -610,9 +614,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         );
     }
 
-    @Override
-    public void reload() {
-        super.reload();
+    public void reloadCfg(){
         cfg.setup();
         Crux.debug = cfg.DEBUG.value().value().shortValue();
         cfg.GLOBAL_STRING_TAGS.valueOr(Map.of()).keySet().forEach(id ->{
@@ -623,6 +625,12 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             StringListResolver resolver = new StringListResolverHolder(id, () -> cfg.GLOBAL_STRING_LIST_TAGS.valueOr(Map.of()).get(id));
             Crux.format().globalStringListResolvers().register(resolver);
         });
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+        reloadCfg();
         loadTags();
         //langProvider.reload(this);
 

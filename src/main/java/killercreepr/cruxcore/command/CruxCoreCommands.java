@@ -91,6 +91,14 @@ public class CruxCoreCommands {
                             return 1;
                         })
                 )
+                .then(
+                    Commands.literal("config.yml")
+                        .executes(ctx ->{
+                            plugin.reloadCfg();
+                            getExecutor(ctx.getSource()).sendMessage("Reloaded CruxCore config.");
+                            return 1;
+                        })
+                )
         ).then(
             Commands.literal("module")
                 .then(
