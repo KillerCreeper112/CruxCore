@@ -1,5 +1,6 @@
 package killercreepr.cruxcore.command;
 
+import com.destroystokyo.paper.entity.ai.Goal;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -9,6 +10,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -31,6 +33,8 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -109,6 +113,28 @@ public class CruxCoreCommands {
                                     CruxModule module = ctx.getArgument("module", CruxModule.class);
                                     getExecutor(ctx.getSource()).sendMessage("Reloading CruxModule: " + module.name());
                                     module.reload(plugin);
+                                    return 1;
+                                })
+                        )
+                )
+        ).then(
+            Commands.literal("mob")
+                .then(
+                    Commands.literal("goals")
+                        .then(
+                            Commands.argument("target", ArgumentTypes.entity())
+                                .executes(ctx ->{
+                                    var sender = getExecutor(ctx.getSource());
+                                    for(Entity e : ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                        .resolve(ctx.getSource())){
+                                        if(!(e instanceof Mob mob)) continue;
+
+                                        int index = 0;
+                                        for (Goal<Mob> goal : plugin.getServer().getMobGoals().getAllGoals(mob)) {
+                                            index++;
+                                            sender.sendMessage("#" + index + " - " + goal.getKey().getNamespacedKey());
+                                        }
+                                    }
                                     return 1;
                                 })
                         )

@@ -105,12 +105,16 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.level.block.LeavesBlock;
 import org.bukkit.EntityEffect;
+import org.bukkit.block.data.type.Leaves;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.block.data.type.CraftLeaves;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
@@ -391,6 +395,14 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
                 getLogger().severe("ERROR WHILE UNLOADING WORLD: " + world.key());
                 ignored.printStackTrace();
             }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if(event.getBlockPlaced().getBlockData() instanceof Leaves l){
+            l.setDistance(10);
+            event.getBlockPlaced().setBlockData(l);
         }
     }
 
