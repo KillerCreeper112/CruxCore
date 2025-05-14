@@ -130,6 +130,7 @@ public class CruxCoreCommands {
                                         if(!(e instanceof Mob mob)) continue;
 
                                         int index = 0;
+                                        sender.sendMessage("Showing mob goals for " + mob.getName() + ":");
                                         for (Goal<Mob> goal : plugin.getServer().getMobGoals().getAllGoals(mob)) {
                                             index++;
                                             sender.sendMessage("#" + index + " - " + goal.getKey().getNamespacedKey());
