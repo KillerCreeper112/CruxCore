@@ -398,14 +398,6 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockPlace(BlockPlaceEvent event) {
-        if(event.getBlockPlaced().getBlockData() instanceof Leaves l){
-            l.setDistance(10);
-            event.getBlockPlaced().setBlockData(l);
-        }
-    }
-
 
     @Override
     public void disabled() {
