@@ -139,6 +139,20 @@ public class CruxCoreCommands {
                                     return 1;
                                 })
                         )
+                ).then(
+                    Commands.literal("hitbox")
+                        .then(
+                            Commands.argument("target", ArgumentTypes.entity())
+                                .executes(ctx ->{
+                                    var sender = getExecutor(ctx.getSource());
+                                    for(Entity e : ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                        .resolve(ctx.getSource())){
+                                        if(!(e instanceof Mob mob)) continue;
+                                        sender.sendMessage(mob.getName() + " width=" + mob.getWidth() + ", height=" + mob.getHeight());
+                                    }
+                                    return 1;
+                                })
+                        )
                 )
         ).then(
             Commands.literal("uuid")
