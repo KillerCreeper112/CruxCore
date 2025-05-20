@@ -680,13 +680,6 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             new CruxFolder(this, "menus").file()
         );
 
-        new CruxCraftingRecipeLoader(CruxCraftingCfg.FILE_CRUX_CRAFTING_RECIPE, recipe ->{
-            craftingManager.addRecipe(recipe);
-            Crux.log(Level.INFO, "CruxCore global crafting recipe registered: " + ((Keyed) recipe).key());
-        }).loadConfiguration(
-            new CruxFolder(this, "crafting/recipe/global").file()
-        );
-
         new CraftingRecipeLoader().load(
             new CruxConfig(this, "crafting_recipes"), getServer()
         );
