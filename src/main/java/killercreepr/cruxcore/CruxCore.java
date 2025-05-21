@@ -31,6 +31,7 @@ import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.plugin.module.CruxMainModule;
 import killercreepr.crux.core.registries.CruxModuleRegistry;
 import killercreepr.crux.core.registries.CruxRegistries;
+import killercreepr.crux.core.text.tags.standard.minimessage.DurationTag;
 import killercreepr.crux.core.util.CruxWorldUtil;
 import killercreepr.cruxadvancements.core.CruxAdvancementsModule;
 import killercreepr.cruxadvancements.core.config.CruxAdvanceCfgData;
