@@ -30,6 +30,29 @@ public class ItemStackListener implements Listener {
         });
     }
 
+    /*@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onBrewCustom(BrewEvent event) {
+        var inv = event.getContents();
+        var ingredient = inv.getIngredient();
+        if(CruxItem.isEmpty(ingredient)) return;
+        if(!Crux.handlers().item().getType(ingredient).equals(Key.key("gunpowder"))) return;
+        int index = -1;
+        for (ItemStack result : event.getResults()) {
+            index++;
+            if(CruxItem.isEmpty(result)) return;
+            if(!PluginItem.isPluginItem(result)) return;
+            Key itemKey = Crux.handlers().item().getType(result);
+            Key toKey = Crux.key(
+                itemKey.namespace() + ":" + itemKey.value().replace("_potion", "_splash_potion")
+            );
+            var mix = BrewingRecipeLoader.SPLASH_POTION_MIXES.get(toKey);
+            if(mix != null){
+                event.getResults().set(index, mix.getResult());
+            }
+        }
+    }*/
+
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBrew(BrewEvent event) {
         event.getResults().forEach(item -> Crux.handlers().item().update(item));

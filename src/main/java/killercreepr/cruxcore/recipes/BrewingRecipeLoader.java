@@ -6,11 +6,13 @@ import killercreepr.crux.api.item.dynamic.DynamicItem;
 import killercreepr.crux.api.text.context.TextParserContext;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.util.CruxKey;
+import killercreepr.crux.paper.ItemHolder;
 import killercreepr.cruxconfig.config.common.element.FileObject;
 import killercreepr.cruxconfig.config.common.file.DataFile;
 import killercreepr.cruxpotions.api.potion.CruxPotion;
 import killercreepr.cruxpotions.core.component.PotionComponents;
 import net.kyori.adventure.key.Key;
+import org.bukkit.Material;
 import org.bukkit.Registry;
 import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +25,7 @@ import java.util.logging.Level;
 
 public class BrewingRecipeLoader {
     public static final Map<Key, DisplayMix> DISPLAY_POTION_MIXES = new HashMap<>();
+    public static final Map<Key, PotionMix> SPLASH_POTION_MIXES = new HashMap<>();
 
     public void load(@NotNull DataFile cfg, @NotNull Server server){
         if(!(cfg.getRoot() instanceof FileObject root)) return;
@@ -55,6 +58,29 @@ public class BrewingRecipeLoader {
                 return ingredient.equals(Crux.handlers().item().getType(item));
             }));
             server.getPotionBrewer().addPotionMix(mix);
+
+            //SPLASH
+            if(resultItem.getType() == Material.POTION){
+                Key itemKey = Crux.handlers().item().getType(resultItem);
+                ItemHolder holder = Crux.handlers().item().getItem(
+                    Crux.key(
+                        itemKey.namespace() + ":" + itemKey.value().replace("_potion", "_splash_potion")
+                    )
+                );
+                if(holder != null){
+                    recipeKey = Crux.key(holder.key().key().value());
+                    server.getPotionBrewer().removePotionMix(CruxKey.key(recipeKey));
+                    mix = new PotionMix(CruxKey.key(recipeKey), holder.value(),
+                        PotionMix.createPredicateChoice(item ->{
+                            return itemKey.equals(Crux.handlers().item().getType(item));
+                        }), PotionMix.createPredicateChoice(item ->{
+                        return Key.key("gunpowder").equals(Crux.handlers().item().getType(item));
+                    }));
+                    server.getPotionBrewer().addPotionMix(mix);
+                    SPLASH_POTION_MIXES.put(mix.key(), mix);
+                }
+            }
+            //SPLASH
 
             if(display){
                 var potList = CruxItem.wrap(resultItem).getOrDefaultData(PotionComponents.STORED_CRUX_POTIONS);

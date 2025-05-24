@@ -31,7 +31,6 @@ import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.plugin.module.CruxMainModule;
 import killercreepr.crux.core.registries.CruxModuleRegistry;
 import killercreepr.crux.core.registries.CruxRegistries;
-import killercreepr.crux.core.text.tags.standard.minimessage.DurationTag;
 import killercreepr.crux.core.util.CruxWorldUtil;
 import killercreepr.cruxadvancements.core.CruxAdvancementsModule;
 import killercreepr.cruxadvancements.core.config.CruxAdvanceCfgData;
@@ -106,18 +105,11 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.level.block.LeavesBlock;
-import org.bukkit.EntityEffect;
-import org.bukkit.block.data.type.Leaves;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.block.data.type.CraftLeaves;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
@@ -658,15 +650,15 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             new CruxFolder(this, "entity_spawn_groups").file()
         );
 
+
+        new LootTableLoader().loadConfiguration(
+            new CruxFolder(this, "loot_tables").file()
+        );
         MODULES.reload(this);
         CruxRegistries.PLUGIN.forEach(plugin ->{
             if(plugin instanceof CruxCore) return;
             plugin.reload(this);
         });
-
-        new LootTableLoader().loadConfiguration(
-            new CruxFolder(this, "loot_tables").file()
-        );
 
         structureManager.reload(this);
         for(CruxWorld world : worldManager.getWorlds()){

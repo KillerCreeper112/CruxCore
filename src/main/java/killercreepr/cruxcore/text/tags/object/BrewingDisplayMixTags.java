@@ -10,7 +10,6 @@ import killercreepr.crux.api.text.tags.container.TagContainer;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.text.resolver.Tag;
 import killercreepr.crux.core.util.CruxColor;
-import killercreepr.cruxcore.CruxCore;
 import killercreepr.cruxcore.recipes.BrewingRecipeLoader;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
