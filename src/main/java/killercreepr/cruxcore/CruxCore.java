@@ -24,6 +24,7 @@ import killercreepr.crux.api.valueproviders.number.NumberProvider;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.block.tag.BaseBlockTag;
 import killercreepr.crux.core.communication.lang.SimpleCreateLang;
+import killercreepr.crux.core.data.tick.SimpleCruxTick;
 import killercreepr.crux.core.entity.memory.standard.PlayerBossBarHolder;
 import killercreepr.crux.core.entity.tag.BaseEntityTag;
 import killercreepr.crux.core.item.tag.BaseItemTag;
@@ -488,6 +489,18 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             public boolean isTagged(@NotNull Entity entity) {
                 if(!(entity instanceof Mob)) return false;
                 return !CruxMob.isInCategory(entity, MobCategory.OBJECT, MobCategory.COSMETIC);
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("player")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return entity instanceof Player;
+            }
+        });
+        registerEntityTag(new BaseEntityTag(Crux.key("human")) {
+            @Override
+            public boolean isTagged(@NotNull Entity entity) {
+                return entity instanceof HumanEntity;
             }
         });
         for(MobCategory category : CruxEntityRegistries.MOB_CATEGORY){

@@ -10,21 +10,28 @@ import killercreepr.crux.paper.ItemHolder;
 import killercreepr.cruxconfig.config.common.element.FileObject;
 import killercreepr.cruxconfig.config.common.file.DataFile;
 import killercreepr.cruxpotions.api.potion.CruxPotion;
+import killercreepr.cruxpotions.api.potion.StoredPotion;
 import killercreepr.cruxpotions.core.component.PotionComponents;
+import killercreepr.cruxpotions.core.potions.DescribedPotion;
+import killercreepr.cruxpotions.core.registries.CruxPotionRegistries;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 public class BrewingRecipeLoader {
     public static final Map<Key, DisplayMix> DISPLAY_POTION_MIXES = new HashMap<>();
+    public static final Map<Key, DisplayMix> NON_BREW_DISPLAY_POTION_MIXES = new HashMap<>();
     public static final Map<Key, PotionMix> SPLASH_POTION_MIXES = new HashMap<>();
 
     public void load(@NotNull DataFile cfg, @NotNull Server server){
@@ -70,14 +77,14 @@ public class BrewingRecipeLoader {
                 if(holder != null){
                     recipeKey = Crux.key(holder.key().key().value());
                     server.getPotionBrewer().removePotionMix(CruxKey.key(recipeKey));
-                    mix = new PotionMix(CruxKey.key(recipeKey), holder.value(),
+                    PotionMix mixSplash = new PotionMix(CruxKey.key(recipeKey), holder.value(),
                         PotionMix.createPredicateChoice(item ->{
                             return itemKey.equals(Crux.handlers().item().getType(item));
                         }), PotionMix.createPredicateChoice(item ->{
                         return Key.key("gunpowder").equals(Crux.handlers().item().getType(item));
                     }));
-                    server.getPotionBrewer().addPotionMix(mix);
-                    SPLASH_POTION_MIXES.put(mix.key(), mix);
+                    server.getPotionBrewer().addPotionMix(mixSplash);
+                    SPLASH_POTION_MIXES.put(mixSplash.key(), mixSplash);
                 }
             }
             //SPLASH
@@ -108,8 +115,30 @@ public class BrewingRecipeLoader {
 
             Crux.log(Level.INFO, "Registered custom brewing recipe: " + recipeKey);
         });
+
+        for(CruxPotion potion : CruxPotionRegistries.POTION){
+            if(!(potion instanceof DescribedPotion)) continue;
+            if(DISPLAY_POTION_MIXES.containsKey(potion.key())) continue;
+            DisplayMix displayMix = new DisplayMix(
+                new PotionMix(
+                    CruxKey.key(potion.key()),
+                    CruxItem.create(Material.POTION)
+                        .customName("Potion of " + potion.getName())
+                        .editThis(c ->{
+                            c.set(PotionComponents.STORED_CRUX_POTIONS, List.of(StoredPotion.storedPotion(potion, 1200, 0)));
+                            Crux.handlers().item().update(c.item());
+                        })
+                        .item(),
+                    RecipeChoice.empty(), RecipeChoice.empty()
+                ),NOT_BREWABLE, NOT_BREWABLE, potion
+            );
+            NON_BREW_DISPLAY_POTION_MIXES.put(potion.key(), displayMix);
+        }
     }
 
+    protected final static ItemStack NOT_BREWABLE = CruxItem.create(Material.BARRIER)
+        .itemName("<red>This potion is not brewable")
+        .item();
     public static class DisplayMix{
         protected final PotionMix mix;
         protected final ItemStack input;
