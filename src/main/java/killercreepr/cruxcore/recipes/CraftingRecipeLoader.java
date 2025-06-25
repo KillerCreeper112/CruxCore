@@ -9,9 +9,7 @@ import killercreepr.cruxconfig.config.common.element.FileObject;
 import killercreepr.cruxconfig.config.common.file.DataFile;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Server;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

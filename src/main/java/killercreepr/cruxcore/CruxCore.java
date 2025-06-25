@@ -64,6 +64,7 @@ import killercreepr.cruxcore.menu.StandardCraftingMenuHolder;
 import killercreepr.cruxcore.menu.StandardCraftingRecipeListHolder;
 import killercreepr.cruxcore.recipes.BrewingRecipeLoader;
 import killercreepr.cruxcore.recipes.CraftingRecipeLoader;
+import killercreepr.cruxcore.recipes.FurnaceRecipeLoader;
 import killercreepr.cruxcore.text.tags.StringListResolverHolder;
 import killercreepr.cruxcore.text.tags.StringResolverHolder;
 import killercreepr.cruxcore.text.tags.object.BrewingDisplayMixTags;
@@ -692,6 +693,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         Crux.scheduler().runTaskLater(() ->{
             new BrewingRecipeLoader().load(
                 new CruxConfig(this, "brewing_recipes"), getServer()
+            );
+            new FurnaceRecipeLoader().load(
+                new CruxConfig(this, "furnace_recipes"), getServer()
             );
         }, 100L);
 

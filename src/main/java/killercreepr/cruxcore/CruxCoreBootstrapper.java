@@ -3,6 +3,7 @@ package killercreepr.cruxcore;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import killercreepr.cruxentities.CruxEntitiesBootstrapper;
+import org.bukkit.potion.PotionType;
 
 public class CruxCoreBootstrapper implements PluginBootstrap {
     /**
