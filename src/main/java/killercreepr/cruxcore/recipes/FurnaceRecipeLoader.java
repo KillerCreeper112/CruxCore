@@ -58,6 +58,8 @@ public class FurnaceRecipeLoader {
                     CruxKey.key(Crux.key("blasting/" + key)), resultItem, new RecipeChoice.ExactChoice(ingredientList),
                     o.get("blasting_experience").getAsFloat(), o.get("blasting_cooking_time").getAsInt()
                 );
+                r = server.getRecipe(blastingRecipe.getKey());
+                if(r != null) server.removeRecipe(blastingRecipe.getKey(), false);
                 server.addRecipe(blastingRecipe, false);
                 Crux.log(Level.INFO, "Registered blasting recipe: " + blastingRecipe.key());
             }
@@ -66,6 +68,8 @@ public class FurnaceRecipeLoader {
                     CruxKey.key(Crux.key("smoking/" + key)), resultItem, new RecipeChoice.ExactChoice(ingredientList),
                     o.get("smoking_experience").getAsFloat(), o.get("smoking_cooking_time").getAsInt()
                 );
+                r = server.getRecipe(blastingRecipe.getKey());
+                if(r != null) server.removeRecipe(blastingRecipe.getKey(), false);
                 server.addRecipe(blastingRecipe, false);
                 Crux.log(Level.INFO, "Registered smoking recipe: " + blastingRecipe.key());
             }
