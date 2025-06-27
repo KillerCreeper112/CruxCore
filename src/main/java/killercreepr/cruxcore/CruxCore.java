@@ -89,6 +89,7 @@ import killercreepr.cruxitems.core.CruxItemsModule;
 import killercreepr.cruxitems.core.registries.CruxItemRegistries;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxmenus.api.menu.holder.MenuItems;
+import killercreepr.cruxmenus.core.menu.config.handlers.FileDataExchange;
 import killercreepr.cruxpotions.core.CruxPotionsModule;
 import killercreepr.cruxstatistics.core.CruxStatisticsModule;
 import killercreepr.cruxstatistics.core.statistic.PlayerCruxStatisticHolder;
@@ -101,6 +102,7 @@ import killercreepr.cruxworlds.api.world.CruxWorld;
 import killercreepr.cruxworlds.api.world.manager.CruxWorldManager;
 import killercreepr.cruxworlds.core.CruxWorldsModule;
 import killercreepr.cruxworlds.core.command.CruxWorldsCommands;
+import killercreepr.cruxworlds.core.config.loader.EntitySpawnGroupLootTableLoader;
 import killercreepr.cruxworlds.core.config.loader.NaturalEntityGroupGroupCfgLoader;
 import killercreepr.cruxworlds.core.world.manager.SimpleCruxWorldManager;
 import net.kyori.adventure.key.Key;
@@ -667,6 +669,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
         new LootTableLoader().loadConfiguration(
             new CruxFolder(this, "loot_tables").file()
+        );
+        new EntitySpawnGroupLootTableLoader().loadConfiguration(
+            new CruxFolder(this, "entity_spawn_group_loot_tables").file()
         );
         MODULES.reload(this);
         CruxRegistries.PLUGIN.forEach(plugin ->{
