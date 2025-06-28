@@ -16,14 +16,21 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.api.communication.CreateSound;
 import killercreepr.crux.api.communication.CreateTitle;
+import killercreepr.crux.api.data.DataExchange;
 import killercreepr.crux.api.plugin.module.CruxModule;
 import killercreepr.crux.api.text.tags.container.TagContainer;
+import killercreepr.crux.api.valueproviders.number.NumberProvider;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.command.argument.CruxCmdArguments;
 import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.util.CruxMath;
 import killercreepr.crux.core.util.CruxString;
 import killercreepr.cruxcore.CruxCore;
+import killercreepr.cruxcore.menu.PluginItemsMenu;
+import killercreepr.cruxmenus.api.menu.holder.MenuHolder;
+import killercreepr.cruxmenus.api.menu.holder.MenuItems;
+import killercreepr.cruxmenus.core.registries.MenuRegistries;
+import killercreepr.cruxmenus.core.registries.Menus;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
@@ -38,10 +45,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class CruxCoreCommands {
     protected final @NotNull CruxCore plugin;
@@ -103,6 +107,30 @@ public class CruxCoreCommands {
                             return 1;
                         })
                 )
+        ).then(
+            Commands.literal("items")
+                .executes(ctx ->{
+                    if(!(getExecutor(ctx.getSource()) instanceof Player p)) return -1;
+                    var holder = MenuHolder.holder(
+                        Crux.key("temp/plugin_items"),
+                        "Items <module_plugin_items_page>/<module_plugin_items_max_page>",
+                        NumberProvider.constant(54),
+                        MenuItems.items(new TreeMap<>()),
+                        DataExchange.empty(),
+                        new ArrayList<>()
+                    );
+                    holder.setRegistry(plugin.cruxMenus().menuRegistry());
+
+                    var menu = new PluginItemsMenu(
+                        holder,
+                        DataExchange.builder()
+                            .put("viewer", p)
+                            .build()
+                    );
+                    menu.load();
+                    menu.open(p);
+                    return 1;
+                })
         ).then(
             Commands.literal("module")
                 .then(
