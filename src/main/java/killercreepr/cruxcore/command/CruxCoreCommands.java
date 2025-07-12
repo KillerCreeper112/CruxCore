@@ -29,8 +29,6 @@ import killercreepr.cruxcore.CruxCore;
 import killercreepr.cruxcore.menu.PluginItemsMenu;
 import killercreepr.cruxmenus.api.menu.holder.MenuHolder;
 import killercreepr.cruxmenus.api.menu.holder.MenuItems;
-import killercreepr.cruxmenus.core.registries.MenuRegistries;
-import killercreepr.cruxmenus.core.registries.Menus;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
