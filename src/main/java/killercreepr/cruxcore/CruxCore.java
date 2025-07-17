@@ -335,7 +335,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             new CraftingListener(this, craftingManager),
             new CruxCoreLimitedRecipeListener(craftingManager),
             new CustomEventListener(),
-            new CustomObjectiveListener()
+            new CustomObjectiveListener(),
+
+            new DebugListener(cfg)
         );
         worldManager.buildRunnable().runTaskTimerAsynchronously(this, 1L, 1L);
         getServer().getScheduler().runTaskLater(this, () ->{
