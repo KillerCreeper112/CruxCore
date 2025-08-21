@@ -129,9 +129,12 @@ public class CruxCoreCommands {
                                 return 0;
                             }
                             sender.sendMessage(
-                                Component.text("UUID for " + name + " is: " + uuid)
+                                Component.empty()
                                     .hoverEvent(HoverEvent.showText(Component.text("Click to copy")))
                                     .clickEvent(ClickEvent.copyToClipboard(uuid.toString()))
+                                    .append(
+                                        Component.text("UUID for " + name + " is: " + uuid)
+                                    )
                             );
                             return 1;
                         })
