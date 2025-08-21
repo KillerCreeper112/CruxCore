@@ -35,6 +35,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -102,6 +103,36 @@ public class CruxCoreCommands {
                         .executes(ctx ->{
                             plugin.reloadCfg();
                             getExecutor(ctx.getSource()).sendMessage("Reloaded CruxCore config.");
+                            return 1;
+                        })
+                )
+        ).then(
+            Commands.literal("uuid")
+                .then(
+                    Commands.argument("name", StringArgumentType.string())
+                        .suggests((ctx, builder) ->{
+                            for(OfflinePlayer player : plugin.getServer().getOfflinePlayers()){
+                                builder.suggest(player.getName());
+                            }
+                            for(Player p : plugin.getServer().getOnlinePlayers()){
+                                builder.suggest(p.getName());
+                            }
+                            return builder.buildFuture();
+                        })
+                        .executes(ctx ->{
+                            CommandSender sender = getExecutor(ctx.getSource());
+                            String name = ctx.getArgument("name", String.class);
+                            UUID uuid = plugin.getServer().getPlayerUniqueId(name);
+
+                            if(uuid == null){
+                                sender.sendMessage("No UUID for " + name);
+                                return 0;
+                            }
+                            sender.sendMessage(
+                                Component.text("UUID for " + name + " is: " + uuid)
+                                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy")))
+                                    .clickEvent(ClickEvent.copyToClipboard(uuid.toString()))
+                            );
                             return 1;
                         })
                 )
