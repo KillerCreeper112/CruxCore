@@ -20,6 +20,7 @@ public class CruxCoreConfig extends Cfg {
     public final CfgValue<Map<String, List<String>>> GLOBAL_STRING_LIST_TAGS = new CommonValue<>(){};
     public final CfgValue<List<Key>> AUTO_LOAD_WORLDS = new CommonValue<>(){};
     public final CfgValue<List<CfgCmdMenu>> CMD_MENUS = new CommonValue<>(){};
+    public final CfgValue<Map<Key, Map<String, String>>> INDEXES = new CommonValue<>(){};
     public CruxCoreConfig(@NotNull Plugin plugin, @NotNull String path) {
         super(plugin, path);
     }

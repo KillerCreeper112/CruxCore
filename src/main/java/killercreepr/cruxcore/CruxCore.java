@@ -18,13 +18,13 @@ import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
 import killercreepr.crux.api.event.ServerShutDownEvent;
 import killercreepr.crux.api.item.tag.ItemTag;
+import killercreepr.crux.api.registry.index.Index;
 import killercreepr.crux.api.text.resolver.StringListResolver;
 import killercreepr.crux.api.text.resolver.StringResolver;
 import killercreepr.crux.api.valueproviders.number.NumberProvider;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.block.tag.BaseBlockTag;
 import killercreepr.crux.core.communication.lang.SimpleCreateLang;
-import killercreepr.crux.core.data.tick.SimpleCruxTick;
 import killercreepr.crux.core.entity.memory.standard.PlayerBossBarHolder;
 import killercreepr.crux.core.entity.tag.BaseEntityTag;
 import killercreepr.crux.core.item.tag.BaseItemTag;
@@ -89,7 +89,6 @@ import killercreepr.cruxitems.core.CruxItemsModule;
 import killercreepr.cruxitems.core.registries.CruxItemRegistries;
 import killercreepr.cruxmenus.CruxMenusModule;
 import killercreepr.cruxmenus.api.menu.holder.MenuItems;
-import killercreepr.cruxmenus.core.menu.config.handlers.FileDataExchange;
 import killercreepr.cruxpotions.core.CruxPotionsModule;
 import killercreepr.cruxstatistics.core.CruxStatisticsModule;
 import killercreepr.cruxstatistics.core.statistic.PlayerCruxStatisticHolder;
@@ -114,8 +113,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -230,6 +231,16 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     }
 
     public CreateLang LANG = new SimpleCreateLang();
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+        Player p = event.getPlayer();
+        event.setCancelled(true);
+
+        Vector dir = p.getEyeLocation().getDirection().multiply(-1.4);
+        p.setVelocity(dir);
+    }
+
 
     @Override
     public void onLoad() {
@@ -643,6 +654,9 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             StringListResolver resolver = new StringListResolverHolder(id, () -> cfg.GLOBAL_STRING_LIST_TAGS.valueOr(Map.of()).get(id));
             Crux.format().globalStringListResolvers().register(resolver);
         });
+        cfg.INDEXES.valueOr(Map.of()).forEach((key, map) ->{
+            CruxRegistries.STRING_INDEXES.register(key, Index.index(map));
+        });
     }
 
     @Override
@@ -650,6 +664,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         super.reload();
         reloadCfg();
         loadTags();
+
         //langProvider.reload(this);
 
         //CRUX_CONFIGS.reload(this);
