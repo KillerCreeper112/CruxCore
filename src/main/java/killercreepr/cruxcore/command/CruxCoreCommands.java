@@ -193,7 +193,13 @@ public class CruxCoreCommands {
                                         sender.sendMessage("Showing mob goals for " + mob.getName() + ":");
                                         for (Goal<Mob> goal : plugin.getServer().getMobGoals().getAllGoals(mob)) {
                                             index++;
-                                            sender.sendMessage("#" + index + " - " + goal.getKey().getNamespacedKey());
+                                            sender.sendMessage(Component.empty()
+                                                    .clickEvent(ClickEvent.copyToClipboard(goal.getKey().getNamespacedKey().asString()))
+                                                .append(
+                                                    Component.text(
+                                                        "#" + index + " - " + goal.getKey().getNamespacedKey()
+                                                    )
+                                                ));
                                         }
                                     }
                                     return 1;

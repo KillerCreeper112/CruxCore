@@ -113,10 +113,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -231,16 +229,6 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     }
 
     public CreateLang LANG = new SimpleCreateLang();
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
-        Player p = event.getPlayer();
-        event.setCancelled(true);
-
-        Vector dir = p.getEyeLocation().getDirection().multiply(-1.4);
-        p.setVelocity(dir);
-    }
-
 
     @Override
     public void onLoad() {
