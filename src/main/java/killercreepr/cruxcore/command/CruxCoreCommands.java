@@ -38,10 +38,9 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Registry;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -204,6 +203,116 @@ public class CruxCoreCommands {
                                     }
                                     return 1;
                                 })
+                        )
+                )
+        ).then(
+            Commands.literal("entity")
+                .then(
+                    Commands.literal("hp")
+                        .then(
+                            Commands.argument("target", ArgumentTypes.entities())
+                                .then(
+                                    Commands.argument("value", StringArgumentType.greedyString())
+                                        .executes(ctx ->{
+                                            var sender = getExecutor(ctx.getSource());
+                                            var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                                .resolve(ctx.getSource());
+                                            var value = ctx.getArgument("value", String.class);
+                                            for(Entity e : list){
+                                                if(!(e instanceof LivingEntity mob)) continue;
+                                                double hp = CruxMath.evaluate(Crux.format().deserializeString(value, TagContainer.string().hook(e)));
+                                                mob.setHealth(CruxMath.clamp(
+                                                    hp, 0D, mob.getAttribute(Attribute.MAX_HEALTH).getValue()
+                                                ));
+                                            }
+                                            sender.sendMessage("Set health to " + value + " for " + list.size() + " entities");
+                                            return 1;
+                                        })
+                                )
+                        )
+                ).then(
+                    Commands.literal("ai")
+                        .then(
+                            Commands.argument("target", ArgumentTypes.entities())
+                                .then(
+                                    Commands.argument("value", StringArgumentType.greedyString())
+                                        .executes(ctx ->{
+                                            var sender = getExecutor(ctx.getSource());
+                                            var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                                .resolve(ctx.getSource());
+                                            var value = ctx.getArgument("value", String.class);
+                                            for(Entity e : list){
+                                                if(!(e instanceof LivingEntity mob)) continue;
+                                                String x = Crux.format().deserializeString(value, TagContainer.string().hook(e));
+                                                mob.setAI(CruxString.parseBoolean(x));
+                                            }
+                                            sender.sendMessage("Set AI to " + value + " for " + list.size() + " entities");
+                                            return 1;
+                                        })
+                                )
+                        )
+                ).then(
+                    Commands.literal("aware")
+                        .then(
+                            Commands.argument("target", ArgumentTypes.entities())
+                                .then(
+                                    Commands.argument("value", StringArgumentType.greedyString())
+                                        .executes(ctx ->{
+                                            var sender = getExecutor(ctx.getSource());
+                                            var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                                .resolve(ctx.getSource());
+                                            var value = ctx.getArgument("value", String.class);
+                                            for(Entity e : list){
+                                                if(!(e instanceof Mob mob)) continue;
+                                                String x = Crux.format().deserializeString(value, TagContainer.string().hook(e));
+                                                mob.setAware(CruxString.parseBoolean(x));
+                                            }
+                                            sender.sendMessage("Set aware to " + value + " for " + list.size() + " entities");
+                                            return 1;
+                                        })
+                                )
+                        )
+                ).then(
+                    Commands.literal("food")
+                        .then(
+                            Commands.argument("target", ArgumentTypes.entities())
+                                .then(
+                                    Commands.argument("value", StringArgumentType.greedyString())
+                                        .executes(ctx ->{
+                                            var sender = getExecutor(ctx.getSource());
+                                            var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                                .resolve(ctx.getSource());
+                                            var value = ctx.getArgument("value", String.class);
+                                            for(Entity e : list){
+                                                if(!(e instanceof HumanEntity mob)) continue;
+                                                double hp = CruxMath.evaluate(Crux.format().deserializeString(value, TagContainer.string().hook(e)));
+                                                mob.setFoodLevel((int) hp);
+                                            }
+                                            sender.sendMessage("Set food level to " + value + " for " + list.size() + " entities");
+                                            return 1;
+                                        })
+                                )
+                        )
+                ).then(
+                    Commands.literal("saturation")
+                        .then(
+                            Commands.argument("target", ArgumentTypes.entities())
+                                .then(
+                                    Commands.argument("value", StringArgumentType.greedyString())
+                                        .executes(ctx ->{
+                                            var sender = getExecutor(ctx.getSource());
+                                            var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                                .resolve(ctx.getSource());
+                                            var value = ctx.getArgument("value", String.class);
+                                            for(Entity e : list){
+                                                if(!(e instanceof HumanEntity mob)) continue;
+                                                double hp = CruxMath.evaluate(Crux.format().deserializeString(value, TagContainer.string().hook(e)));
+                                                mob.setSaturation((float) hp);
+                                            }
+                                            sender.sendMessage("Set saturation to " + value + " for " + list.size() + " entities");
+                                            return 1;
+                                        })
+                                )
                         )
                 ).then(
                     Commands.literal("hitbox")

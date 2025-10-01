@@ -396,7 +396,6 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
         }
     }
 
-
     @Override
     public void disabled() {
         super.disabled();
