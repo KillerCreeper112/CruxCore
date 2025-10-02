@@ -1,6 +1,11 @@
 package killercreepr.cruxcore.command;
 
 import com.destroystokyo.paper.entity.ai.Goal;
+import com.destroystokyo.paper.profile.CraftPlayerProfile;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -24,6 +29,7 @@ import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.command.argument.CruxCmdArguments;
 import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.util.CruxMath;
+import killercreepr.crux.core.util.CruxProfile;
 import killercreepr.crux.core.util.CruxString;
 import killercreepr.cruxcore.CruxCore;
 import killercreepr.cruxcore.menu.PluginItemsMenu;
@@ -41,8 +47,13 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
+import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 public class CruxCoreCommands {
@@ -203,6 +214,73 @@ public class CruxCoreCommands {
                                     }
                                     return 1;
                                 })
+                        )
+                )
+        ).then(
+            Commands.literal("player")
+                .then(
+                    Commands.literal("profile")
+                        .then(
+                            Commands.argument("target", ArgumentTypes.entities())
+                                .then(
+                                    Commands.literal("reset")
+                                        .executes(ctx ->{
+                                            var sender = getExecutor(ctx.getSource());
+                                            var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                                .resolve(ctx.getSource());
+                                            for(Entity e : list){
+                                                if(!(e instanceof Player p)) continue;
+                                                PlayerProfile oldProfile = plugin.getServer().createProfileExact(p.getUniqueId(), p.getName());
+                                                p.setPlayerProfile(oldProfile);
+                                            }
+                                            sender.sendMessage("Reset player skin for " + list.size() + " entities");
+                                            return 1;
+                                        })
+                                ).then(
+                                    Commands.literal("skin")
+                                        .then(
+                                            Commands.argument("value", StringArgumentType.greedyString())
+                                                .executes(ctx ->{
+                                                    var sender = getExecutor(ctx.getSource());
+                                                    var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                                        .resolve(ctx.getSource());
+                                                    var value = ctx.getArgument("value", String.class);
+                                                    String skinId = value.contains("minesk") ?
+                                                        value.substring(value.lastIndexOf("/") + 1) :
+                                                        value;
+
+                                                    PlayerProfile profile = fetchSkin(skinId, UUID.randomUUID(), "a");
+                                                    for(Entity e : list){
+                                                        if(!(e instanceof Player p)) continue;
+                                                        PlayerProfile set = plugin.getServer().createProfile(p.getUniqueId(), p.getName());
+                                                        set.setTextures(profile.getTextures());
+                                                        p.setPlayerProfile(set);
+                                                    }
+                                                    sender.sendMessage("Set player skin to " + value + " for " + list.size() + " entities");
+                                                    return 1;
+                                                })
+                                        )
+                                ).then(
+                                    Commands.literal("name")
+                                        .then(
+                                            Commands.argument("value", StringArgumentType.greedyString())
+                                                .executes(ctx ->{
+                                                    var sender = getExecutor(ctx.getSource());
+                                                    var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                                        .resolve(ctx.getSource());
+                                                    var value = ctx.getArgument("value", String.class);
+
+                                                    for(Entity e : list){
+                                                        if(!(e instanceof Player p)) continue;
+                                                        PlayerProfile current = p.getPlayerProfile();
+                                                        PlayerProfile set = plugin.getServer().createProfileExact(current.getId(), value);
+                                                        p.setPlayerProfile(set);
+                                                    }
+                                                    sender.sendMessage("Set player name to " + value + " for " + list.size() + " entities");
+                                                    return 1;
+                                                })
+                                        )
+                                )
                         )
                 )
         ).then(
@@ -581,6 +659,30 @@ public class CruxCoreCommands {
         )
         ;
         return dispatcher.build();
+    }
+
+    public PlayerProfile fetchSkin(String skinId, UUID uuid, String name) {
+        try {
+            URL url = URI.create("https://api.mineskin.org/get/id/" + skinId).toURL();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            try (InputStreamReader reader = new InputStreamReader(connection.getInputStream())) {
+                JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
+                JsonObject texture = json.getAsJsonObject("data").getAsJsonObject("texture");
+
+                String value = texture.get("value").getAsString();
+                String signature = texture.get("signature").getAsString();
+
+                PlayerProfile profile = plugin.getServer().createProfile(uuid, name);
+                profile.setProperty(new ProfileProperty("textures", value, signature));
+
+                return profile;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static @NotNull CommandSender getExecutor(@NotNull CommandSourceStack source) {
