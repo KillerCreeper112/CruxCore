@@ -1,7 +1,6 @@
 package killercreepr.cruxcore.command;
 
 import com.destroystokyo.paper.entity.ai.Goal;
-import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.google.gson.JsonObject;
@@ -29,7 +28,6 @@ import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.command.argument.CruxCmdArguments;
 import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.util.CruxMath;
-import killercreepr.crux.core.util.CruxProfile;
 import killercreepr.crux.core.util.CruxString;
 import killercreepr.cruxcore.CruxCore;
 import killercreepr.cruxcore.menu.PluginItemsMenu;
@@ -47,7 +45,6 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
-import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStreamReader;
