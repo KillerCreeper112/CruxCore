@@ -261,6 +261,37 @@ public class CruxCoreCommands {
                                                 })
                                         )
                                 ).then(
+                                    Commands.literal("playerskin")
+                                        .then(
+                                            Commands.argument("value", StringArgumentType.greedyString())
+                                                .executes(ctx ->{
+                                                    var sender = getExecutor(ctx.getSource());
+                                                    var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                                        .resolve(ctx.getSource());
+                                                    var value = ctx.getArgument("value", String.class);
+                                                    UUID uuid;
+                                                    String name;
+                                                    try{
+                                                        uuid = UUID.fromString(value);
+                                                        name = plugin.getServer().getOfflinePlayer(uuid).getName();
+                                                    } catch (IllegalArgumentException e) {
+                                                        uuid = plugin.getServer().getOfflinePlayer(value).getUniqueId();
+                                                        name = value;
+                                                    }
+
+                                                    PlayerProfile profile = plugin.getServer().createProfileExact(uuid, name);
+                                                    profile.complete();
+                                                    for(Entity e : list){
+                                                        if(!(e instanceof Player p)) continue;
+                                                        PlayerProfile set = plugin.getServer().createProfile(p.getUniqueId(), p.getName());
+                                                        set.setTextures(profile.getTextures());
+                                                        p.setPlayerProfile(set);
+                                                    }
+                                                    sender.sendMessage("Set player skin from player to " + value + " for " + list.size() + " entities");
+                                                    return 1;
+                                                })
+                                        )
+                                ).then(
                                     Commands.literal("name")
                                         .then(
                                             Commands.argument("value", StringArgumentType.greedyString())

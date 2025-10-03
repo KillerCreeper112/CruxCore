@@ -18,6 +18,7 @@ import killercreepr.cruxconfig.config.bukkit.file.CruxJson;
 import killercreepr.cruxconfig.config.common.element.FileArray;
 import killercreepr.cruxconfig.config.common.element.FileObject;
 import killercreepr.cruxcore.CruxCore;
+import killercreepr.cruxcore.util.CruxSurvivalGearGen;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -59,6 +60,24 @@ public class DevCommands {
                                                                   LifecycleEventManager<?> manager){
         //cruxclaim view (player)
         dispatcher.then(
+            Commands.literal("survivegear")
+                .then(
+                    Commands.argument("stage", StringArgumentType.string())
+                        .suggests((ctx, builder) ->{
+                            for (CruxSurvivalGearGen.Stage value : CruxSurvivalGearGen.Stage.values()) {
+                                builder.suggest(value.toString().toLowerCase());
+                            }
+                            return builder.buildFuture();
+                        })
+                        .executes(ctx ->{
+                            CruxSurvivalGearGen.Stage stage = CruxSurvivalGearGen.Stage.valueOf(ctx.getArgument("stage", String.class).toUpperCase());
+                            if(getExecutor(ctx.getSource()) instanceof Player p){
+                                CruxSurvivalGearGen.giveProgressionLoot(p, stage);
+                            }
+                            return 1;
+                        })
+                )
+        ).then(
             Commands.literal("create")
                 .then(
                     Commands.argument("type", StringArgumentType.string())
