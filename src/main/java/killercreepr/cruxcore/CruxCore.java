@@ -351,6 +351,7 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
                 if(data == null) continue;
                 data.getDataHolders().forEach(holder ->{
                     if(holder instanceof Loadable l) l.save();
+                    else if(holder instanceof AutoSavable auto) auto.save();
                 });
             }
             for(var plugin : CruxRegistries.PLUGIN){
