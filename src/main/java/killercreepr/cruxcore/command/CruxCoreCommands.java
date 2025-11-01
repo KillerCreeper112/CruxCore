@@ -20,6 +20,7 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.api.communication.CreateSound;
 import killercreepr.crux.api.communication.CreateTitle;
+import killercreepr.crux.api.communication.lang.LangProvider;
 import killercreepr.crux.api.data.DataExchange;
 import killercreepr.crux.api.plugin.module.CruxModule;
 import killercreepr.crux.api.text.tags.container.TagContainer;
@@ -112,6 +113,44 @@ public class CruxCoreCommands {
                             getExecutor(ctx.getSource()).sendMessage("Reloaded CruxCore config.");
                             return 1;
                         })
+                )
+        ).then(
+            Commands.literal("lang")
+                .then(
+                    Commands.argument("targets", ArgumentTypes.entity())
+                        .then(
+                            Commands.argument("plugin", CruxCmdArguments.CRUX_PLUGIN)
+                                .then(
+                                    Commands.argument("translation", StringArgumentType.string())
+                                        .suggests((ctx, builder) ->{
+                                            var plugin = ctx.getLastChild().getArgument("plugin", CruxPlugin.class);
+                                            if(plugin instanceof LangProvider langProvider){
+                                                for (String id : langProvider.lang().getTranslations()) {
+                                                    builder.suggest(id);
+                                                }
+                                            }
+                                            return builder.buildFuture();
+                                        })
+                                        .executes(ctx ->{
+                                            CruxPlugin cruxPlugin = ctx.getArgument("plugin", CruxPlugin.class);
+                                            String id = ctx.getArgument("translation", String.class);
+                                            var targets = ctx.getArgument("targets", EntitySelectorArgumentResolver.class)
+                                                .resolve(ctx.getSource());
+                                            var sender = getExecutor(ctx.getSource());
+                                            if(cruxPlugin instanceof LangProvider langProvider){
+                                                for(Entity p : targets){
+                                                    var tags = TagContainer.merged().hook(sender).hook(p);
+                                                    langProvider.lang().use(id, p, tags);
+                                                }
+
+                                                getExecutor(ctx.getSource()).sendMessage(
+                                                    Component.text("Sent lang message to " + targets.size() + " players: " + cruxPlugin.name() + " - " + id)
+                                                );
+                                            }
+                                            return 1;
+                                        })
+                                )
+                        )
                 )
         ).then(
             Commands.literal("uuid")
@@ -556,15 +595,15 @@ public class CruxCoreCommands {
         ).then(
             Commands.literal("msg")
                 .then(
-                    Commands.argument("targets", ArgumentTypes.players())
+                    Commands.argument("targets", ArgumentTypes.entities())
                         .then(
                             Commands.argument("text", StringArgumentType.greedyString())
                                 .executes(ctx ->{
-                                    Collection<Player> targets = ctx.getArgument("targets", PlayerSelectorArgumentResolver.class)
+                                    Collection<Entity> targets = ctx.getArgument("targets", EntitySelectorArgumentResolver.class)
                                         .resolve(ctx.getSource());
                                     String text = ctx.getArgument("text", String.class);
 
-                                    for(Player p : targets){
+                                    for(Entity p : targets){
                                         Component output = Crux.format().deserialize(text, TagContainer.merged()
                                             .hook(getExecutor(ctx.getSource()))
                                             .hook(p));
@@ -585,7 +624,7 @@ public class CruxCoreCommands {
         ).then(
             Commands.literal("playsound")
                 .then(
-                    Commands.argument("targets", ArgumentTypes.players())
+                    Commands.argument("targets", ArgumentTypes.entities())
                         .then(
                             Commands.argument("sound", ArgumentTypes.key())
                                 .suggests((ctx, builder) ->{
@@ -596,11 +635,11 @@ public class CruxCoreCommands {
                                     return builder.buildFuture();
                                 })
                                 .executes(ctx ->{
-                                    Collection<Player> targets = ctx.getArgument("targets", PlayerSelectorArgumentResolver.class)
+                                    Collection<Entity> targets = ctx.getArgument("targets", EntitySelectorArgumentResolver.class)
                                         .resolve(ctx.getSource());
                                     Key sound = ctx.getArgument("sound", Key.class);
 
-                                    for(Player p : targets){
+                                    for(Entity p : targets){
                                         CreateSound.sound(sound).playFor(p);
                                     }
 
@@ -613,12 +652,12 @@ public class CruxCoreCommands {
                                 .then(
                                     Commands.argument("volume", FloatArgumentType.floatArg())
                                         .executes(ctx ->{
-                                            Collection<Player> targets = ctx.getArgument("targets", PlayerSelectorArgumentResolver.class)
+                                            Collection<Entity> targets = ctx.getArgument("targets", EntitySelectorArgumentResolver.class)
                                                 .resolve(ctx.getSource());
                                             Key sound = ctx.getArgument("sound", Key.class);
                                             float volume = ctx.getArgument("volume", Float.class);
 
-                                            for(Player p : targets){
+                                            for(Entity p : targets){
                                                 CreateSound.sound(sound, net.kyori.adventure.sound.Sound.Source.MASTER, volume, 1f).playFor(p);
                                             }
 
@@ -630,13 +669,13 @@ public class CruxCoreCommands {
                                         }).then(
                                             Commands.argument("pitch", FloatArgumentType.floatArg())
                                                 .executes(ctx ->{
-                                                    Collection<Player> targets = ctx.getArgument("targets", PlayerSelectorArgumentResolver.class)
+                                                    Collection<Entity> targets = ctx.getArgument("targets", EntitySelectorArgumentResolver.class)
                                                         .resolve(ctx.getSource());
                                                     Key sound = ctx.getArgument("sound", Key.class);
                                                     float volume = ctx.getArgument("volume", Float.class);
                                                     float pitch = ctx.getArgument("pitch", Float.class);
 
-                                                    for(Player p : targets){
+                                                    for(Entity p : targets){
                                                         CreateSound.sound(sound, net.kyori.adventure.sound.Sound.Source.MASTER, volume, pitch).playFor(p);
                                                     }
 
