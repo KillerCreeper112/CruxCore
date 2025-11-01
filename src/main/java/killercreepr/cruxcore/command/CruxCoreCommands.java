@@ -117,38 +117,41 @@ public class CruxCoreCommands {
         ).then(
             Commands.literal("lang")
                 .then(
-                    Commands.argument("targets", ArgumentTypes.entity())
+                    Commands.literal("send")
                         .then(
-                            Commands.argument("plugin", CruxCmdArguments.CRUX_PLUGIN)
+                            Commands.argument("targets", ArgumentTypes.entities())
                                 .then(
-                                    Commands.argument("translation", StringArgumentType.string())
-                                        .suggests((ctx, builder) ->{
-                                            var plugin = ctx.getLastChild().getArgument("plugin", CruxPlugin.class);
-                                            if(plugin instanceof LangProvider langProvider){
-                                                for (String id : langProvider.lang().getTranslations()) {
-                                                    builder.suggest(id);
-                                                }
-                                            }
-                                            return builder.buildFuture();
-                                        })
-                                        .executes(ctx ->{
-                                            CruxPlugin cruxPlugin = ctx.getArgument("plugin", CruxPlugin.class);
-                                            String id = ctx.getArgument("translation", String.class);
-                                            var targets = ctx.getArgument("targets", EntitySelectorArgumentResolver.class)
-                                                .resolve(ctx.getSource());
-                                            var sender = getExecutor(ctx.getSource());
-                                            if(cruxPlugin instanceof LangProvider langProvider){
-                                                for(Entity p : targets){
-                                                    var tags = TagContainer.merged().hook(sender).hook(p);
-                                                    langProvider.lang().use(id, p, tags);
-                                                }
+                                    Commands.argument("plugin", CruxCmdArguments.CRUX_PLUGIN)
+                                        .then(
+                                            Commands.argument("translation", StringArgumentType.string())
+                                                .suggests((ctx, builder) ->{
+                                                    var plugin = ctx.getLastChild().getArgument("plugin", CruxPlugin.class);
+                                                    if(plugin instanceof LangProvider langProvider){
+                                                        for (String id : langProvider.lang().getTranslations()) {
+                                                            builder.suggest(id);
+                                                        }
+                                                    }
+                                                    return builder.buildFuture();
+                                                })
+                                                .executes(ctx ->{
+                                                    CruxPlugin cruxPlugin = ctx.getArgument("plugin", CruxPlugin.class);
+                                                    String id = ctx.getArgument("translation", String.class);
+                                                    var targets = ctx.getArgument("targets", EntitySelectorArgumentResolver.class)
+                                                        .resolve(ctx.getSource());
+                                                    var sender = getExecutor(ctx.getSource());
+                                                    if(cruxPlugin instanceof LangProvider langProvider){
+                                                        for(Entity p : targets){
+                                                            var tags = TagContainer.merged().hook(sender).hook(p);
+                                                            langProvider.lang().use(id, p, tags);
+                                                        }
 
-                                                getExecutor(ctx.getSource()).sendMessage(
-                                                    Component.text("Sent lang message to " + targets.size() + " players: " + cruxPlugin.name() + " - " + id)
-                                                );
-                                            }
-                                            return 1;
-                                        })
+                                                        getExecutor(ctx.getSource()).sendMessage(
+                                                            Component.text("Sent lang message to " + targets.size() + " players: " + cruxPlugin.name() + " - " + id)
+                                                        );
+                                                    }
+                                                    return 1;
+                                                })
+                                        )
                                 )
                         )
                 )
