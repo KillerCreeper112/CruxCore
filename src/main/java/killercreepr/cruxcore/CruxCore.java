@@ -667,21 +667,17 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
         loadBlockSoundGroups();
 
-        new TypedDataComponentLoader().loadConfiguration(
-            new CruxFolder(this, "typed_components").file()
-        );
-
-        new NaturalEntityGroupGroupCfgLoader().loadConfiguration(
-            new CruxFolder(this, "entity_spawn_groups").file()
-        );
-
-
         new LootTableLoader().loadConfiguration(
             new CruxFolder(this, "loot_tables").file()
         );
         new EntitySpawnGroupLootTableLoader().loadConfiguration(
             new CruxFolder(this, "entity_spawn_group_loot_tables").file()
         );
+
+        new NaturalEntityGroupGroupCfgLoader().loadConfiguration(
+            new CruxFolder(this, "entity_spawn_groups").file()
+        );
+
         MODULES.reload(this);
         CruxRegistries.PLUGIN.forEach(plugin ->{
             if(plugin instanceof CruxCore) return;
@@ -699,6 +695,10 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
         CruxCore.inst().cruxMenus().menuRegistry().loadConfiguration(
             new CruxFolder(this, "menus").file()
+        );
+
+        new TypedDataComponentLoader().loadConfiguration(
+            new CruxFolder(this, "typed_components").file()
         );
 
         new CraftingRecipeLoader().load(
