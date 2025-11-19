@@ -11,6 +11,9 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import eu.endercentral.crazy_advancements.CrazyAdvancementsAPI;
+import eu.endercentral.crazy_advancements.advancement.AdvancementDisplay;
+import eu.endercentral.crazy_advancements.advancement.ToastNotification;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -30,8 +33,10 @@ import killercreepr.crux.core.command.argument.CruxCmdArguments;
 import killercreepr.crux.core.plugin.CruxPlugin;
 import killercreepr.crux.core.util.CruxMath;
 import killercreepr.crux.core.util.CruxString;
+import killercreepr.crux.paper.ItemHolder;
 import killercreepr.cruxcore.CruxCore;
 import killercreepr.cruxcore.menu.PluginItemsMenu;
+import killercreepr.cruxitems.core.command.argument.CruxItemsArguments;
 import killercreepr.cruxmenus.api.menu.holder.MenuHolder;
 import killercreepr.cruxmenus.api.menu.holder.MenuItems;
 import net.kyori.adventure.key.Key;
@@ -728,6 +733,46 @@ public class CruxCoreCommands {
                 )
         )
         ;
+
+        if(plugin.getServer().getPluginManager().getPlugin("CrazyAdvancementsAPI") != null){
+            dispatcher.then(
+                Commands.literal("showtoast")
+                    .then(
+                        Commands.argument("targets", ArgumentTypes.players())
+                            .then(
+                                Commands.argument("item", CruxItemsArguments.itemHolder())
+                                    .then(
+                                        Commands.argument("type", StringArgumentType.string())
+                                            .suggests((ctx, builder) ->{
+                                                for (AdvancementDisplay.AdvancementFrame value : AdvancementDisplay.AdvancementFrame.values()) {
+                                                    builder.suggest(value.toString().toLowerCase());
+                                                }
+                                                return builder.buildFuture();
+                                            })
+                                            .then(
+                                                Commands.argument("message", StringArgumentType.greedyString())
+                                                    .executes(ctx ->{
+                                                        var sender = getExecutor(ctx.getSource());
+                                                        var targets = ctx.getArgument("targets", PlayerSelectorArgumentResolver.class)
+                                                            .resolve(ctx.getSource());
+                                                        var item = ctx.getArgument("item", ItemHolder.class).value();
+                                                        String rawType = ctx.getArgument("type", String.class);
+                                                        AdvancementDisplay.AdvancementFrame frame = AdvancementDisplay.AdvancementFrame.parseStrict(rawType);
+                                                        String message = ctx.getArgument("message", String.class);
+                                                        for(Player player : targets) {
+                                                            ToastNotification toast = new ToastNotification(item, message, frame);
+                                                            toast.send(player);
+                                                            sender.sendMessage("Displayed toast to " + player.getName());
+                                                        }
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+                            )
+                    )
+            );
+        }
+
         return dispatcher.build();
     }
 
