@@ -33,9 +33,11 @@ dependencies {
         "E:\\Plugins\\Crux2.0\\crux\\CruxForm\\build\\libs\\CruxForm-1.0.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxStatistics\\build\\libs\\CruxStatistics-1.0.jar",
         "E:\\Plugins\\Crux2.0\\crux\\CruxTickables\\build\\libs\\CruxTickables-1.0.jar",
-        "E:\\Plugins\\Crux2.0\\crux\\CruxCrafting\\build\\libs\\CruxCrafting-1.0.jar",
+        "E:\\Plugins\\Crux2.0\\crux\\CruxCrafting\\build\\libs\\CruxCrafting-1.0.jar"
+    ))
 
-        "E:\\Plugins\\YO\\CruxCore\\run\\plugins\\CrazyAdvancementsAPI-2.21.9.jar",
+    compileOnly(files(
+        "E:\\Plugins\\YO\\CruxCore\\run\\plugins\\CrazyAdvancementsAPI-2.21.9.jar"
     ))
 
     compileOnly(fileTree("libs") {
