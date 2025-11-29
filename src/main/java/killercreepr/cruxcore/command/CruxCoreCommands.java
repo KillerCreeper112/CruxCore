@@ -23,6 +23,7 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.api.communication.CreateSound;
 import killercreepr.crux.api.communication.CreateTitle;
+import killercreepr.crux.api.communication.boss.CreateBossBar;
 import killercreepr.crux.api.communication.lang.LangProvider;
 import killercreepr.crux.api.data.DataExchange;
 import killercreepr.crux.api.plugin.module.CruxModule;
@@ -39,6 +40,7 @@ import killercreepr.cruxcore.menu.PluginItemsMenu;
 import killercreepr.cruxitems.core.command.argument.CruxItemsArguments;
 import killercreepr.cruxmenus.api.menu.holder.MenuHolder;
 import killercreepr.cruxmenus.api.menu.holder.MenuItems;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
@@ -558,6 +560,50 @@ public class CruxCoreCommands {
                             getExecutor(ctx.getSource()).sendActionBar(output);
                             return 1;
                         })
+                )
+        ).then(
+            Commands.literal("bossbar")
+                .then(
+                    Commands.argument("key", StringArgumentType.word())
+                        .then(
+                            Commands.argument("color", StringArgumentType.word())
+                                .suggests((ctx, builder) ->{
+                                    for (String s : BossBar.Color.NAMES.keys()) {
+                                        builder.suggest(s);
+                                    }
+                                    return builder.buildFuture();
+                                })
+                                .then(
+                                    Commands.argument("style", StringArgumentType.word())
+                                        .suggests((ctx, builder) ->{
+                                            for (String s : BossBar.Overlay.NAMES.keys()) {
+                                                builder.suggest(s);
+                                            }
+                                            return builder.buildFuture();
+                                        })
+                                        .then(
+                                            Commands.argument("progress", StringArgumentType.word())
+                                                .then(
+                                                    Commands.argument("duration", StringArgumentType.word())
+                                                        .then(
+                                                            Commands.argument("title", StringArgumentType.greedyString())
+                                                                .executes(ctx ->{
+                                                                    CreateBossBar.bossBar(
+                                                                        ctx.getArgument("key", String.class),
+                                                                        ctx.getArgument("title", String.class),
+                                                                        ctx.getArgument("progress", String.class),
+                                                                        ctx.getArgument("color", String.class),
+                                                                        ctx.getArgument("style", String.class),
+                                                                        ctx.getArgument("duration", String.class),
+                                                                        null
+                                                                    ).showBossBar(getExecutor(ctx.getSource()));
+                                                                    return 1;
+                                                                })
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
                 )
         ).then(
             Commands.literal("title")
