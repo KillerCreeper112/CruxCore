@@ -5,10 +5,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.arguments.FloatArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import eu.endercentral.crazy_advancements.CrazyAdvancementsAPI;
@@ -50,6 +47,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Registry;
 import org.bukkit.Sound;
+import org.bukkit.WeatherType;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
@@ -89,6 +87,98 @@ public class CruxCoreCommands {
                             })
                     )
                     .build(), List.of("fs")
+            );
+            commands.register(
+                Commands.literal("fly")
+                    .requires(source -> source.getSender().hasPermission("cruxcore.command.fly"))
+                    .executes(ctx ->{
+                        if(!(getExecutor(ctx.getSource()) instanceof Player p)) return -1;
+                        p.setAllowFlight(!p.getAllowFlight());
+                        p.sendMessage("Set allowed flight: " + p.getAllowFlight());
+                        return 1;
+                    })
+                    .build()
+            );
+            commands.register(
+                Commands.literal("pweather")
+                    .requires(source -> source.getSender().hasPermission("cruxcore.command.pweather"))
+                    .then(
+                        Commands.literal("reset")
+                            .executes(ctx ->{
+                                var sender = getExecutor(ctx.getSource());
+                                if(!(sender instanceof Player p)) return -1;
+                                p.resetPlayerWeather();
+                                sender.sendMessage("Reset player weather");
+                                return 1;
+                            })
+                    )
+                    .then(
+                        Commands.argument("weather", StringArgumentType.string())
+                            .suggests((ctx, builder) ->{
+                                for (WeatherType value : WeatherType.values()) {
+                                    builder.suggest(value.toString().toLowerCase());
+                                }
+                                return builder.buildFuture();
+                            })
+                            .executes(ctx ->{
+                                var sender = getExecutor(ctx.getSource());
+                                if(!(sender instanceof Player p)) return -1;
+                                WeatherType weatherType;
+                                try{
+                                    weatherType = WeatherType.valueOf(ctx.getArgument("weather", String.class).toUpperCase());
+                                } catch (IllegalArgumentException e) {
+                                    sender.sendMessage("Invalid weather type.");
+                                    return 0;
+                                }
+
+                                p.setPlayerWeather(weatherType);
+                                sender.sendMessage("Set weather to: " + weatherType.toString().toLowerCase());
+                                return 1;
+                            })
+                    )
+                    .build()
+            );
+
+            commands.register(
+                Commands.literal("ptime")
+                    .requires(source -> source.getSender().hasPermission("cruxcore.command.ptime"))
+                    .then(
+                        Commands.literal("reset")
+                            .executes(ctx ->{
+                                var sender = getExecutor(ctx.getSource());
+                                if(!(sender instanceof Player p)) return -1;
+                                p.resetPlayerTime();
+                                sender.sendMessage("Reset player time");
+                                return 1;
+                            })
+                    )
+                    .then(
+                        Commands.literal("set")
+                            .then(
+                                Commands.argument("time", LongArgumentType.longArg())
+                                    .executes(ctx ->{
+                                        var sender = getExecutor(ctx.getSource());
+                                        if(!(sender instanceof Player p)) return -1;
+                                        long time = ctx.getArgument("time", long.class);
+                                        p.setPlayerTime(time, false);
+                                        sender.sendMessage("Set time to " + time + " relative=false");
+                                        return 1;
+                                    })
+                                    .then(
+                                        Commands.argument("relative", BoolArgumentType.bool())
+                                            .executes(ctx ->{
+                                                var sender = getExecutor(ctx.getSource());
+                                                if(!(sender instanceof Player p)) return -1;
+                                                long time = ctx.getArgument("time", long.class);
+                                                boolean relative = ctx.getArgument("relative", boolean.class);
+                                                p.setPlayerTime(time, relative);
+                                                sender.sendMessage("Set time to " + time + " relative=" + relative);
+                                                return 1;
+                                            })
+                                    )
+                            )
+                    )
+                    .build()
             );
         });
     }
