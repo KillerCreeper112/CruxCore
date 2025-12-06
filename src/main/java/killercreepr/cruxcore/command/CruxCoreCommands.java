@@ -723,7 +723,7 @@ public class CruxCoreCommands {
                                                             int stay = ctx.getArgument("stay", Integer.class);
                                                             int fadeOut = ctx.getArgument("fade_out", Integer.class);
                                                             String text = ctx.getArgument("text", String.class);
-                                                            String subText = ctx.getArgument("text", String.class);
+                                                            String subText = ctx.getArgument("sub_text", String.class);
                                                             CreateTitle title = CreateTitle.title(
                                                                 text, subText, fadeIn, stay, fadeOut
                                                             );
