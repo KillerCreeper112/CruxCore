@@ -249,6 +249,32 @@ public class CruxCoreCommands {
                                                     return 1;
                                                 })
                                         )
+                                ).then(
+                                    Commands.literal("crux")
+                                        .then(
+                                            Commands.argument("translation", StringArgumentType.string())
+                                                .suggests((ctx, builder) ->{
+                                                    for (String id : Crux.lang().getTranslations()) {
+                                                        builder.suggest(id);
+                                                    }
+                                                    return builder.buildFuture();
+                                                })
+                                                .executes(ctx ->{
+                                                    String id = ctx.getArgument("translation", String.class);
+                                                    var targets = ctx.getArgument("targets", EntitySelectorArgumentResolver.class)
+                                                        .resolve(ctx.getSource());
+                                                    var sender = getExecutor(ctx.getSource());
+                                                    for(Entity p : targets){
+                                                        var tags = TagContainer.merged().hook(sender).hook(p);
+                                                        Crux.lang().use(id, p, tags);
+                                                    }
+
+                                                    getExecutor(ctx.getSource()).sendMessage(
+                                                        Component.text("Sent lang message to " + targets.size() + " players: crux - " + id)
+                                                    );
+                                                    return 1;
+                                                })
+                                        )
                                 )
                         )
                 )

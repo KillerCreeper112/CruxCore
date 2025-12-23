@@ -7,6 +7,7 @@ import io.papermc.paper.entity.CollarColorable;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import killercreepr.crux.api.block.CruxedBlock;
 import killercreepr.crux.api.block.tag.BlockTag;
+import killercreepr.crux.api.communication.Communicator;
 import killercreepr.crux.api.communication.lang.CreateLang;
 import killercreepr.crux.api.communication.lang.LangProvider;
 import killercreepr.crux.api.data.AutoSavable;
@@ -44,6 +45,7 @@ import killercreepr.cruxconfig.config.bukkit.file.CruxConfig;
 import killercreepr.cruxconfig.config.bukkit.file.CruxFolder;
 import killercreepr.cruxconfig.config.bukkit.handler.BukkitCfgHandlers;
 import killercreepr.cruxconfig.config.bukkit.loader.*;
+import killercreepr.cruxconfig.config.common.element.FileObject;
 import killercreepr.cruxconfig.config.common.file.DataFile;
 import killercreepr.cruxconfig.config.common.handler.AutoFileHandler;
 import killercreepr.cruxconfig.config.registry.CfgRegistries;
@@ -650,6 +652,21 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     @Override
     public void reload() {
         super.reload();
+        DataFile globalLang = BukkitDataFile.parseFromGeneralPath(
+            CruxFolder.file(this, "global_lang.yml"),
+            false
+        );
+        if(globalLang != null){
+            if(globalLang.getRoot() instanceof FileObject o){
+                o.forEach((id, ele) ->{
+                    Communicator communicator = globalLang.deserialize(id, Communicator.class);
+                    if(communicator == null) return;
+                    Crux.lang().put(id, communicator);
+                });
+            }
+            globalLang.close();
+        }
+
         reloadCfg();
         loadTags();
 
@@ -667,13 +684,14 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
         loadBlockSoundGroups();
 
+        new LootTableLoader().loadConfiguration(
+            new CruxFolder(this, "loot_tables").file()
+        );
+
         new TypedDataComponentLoader().loadConfiguration(
             new CruxFolder(this, "typed_components_early").file()
         );
 
-        new LootTableLoader().loadConfiguration(
-            new CruxFolder(this, "loot_tables").file()
-        );
         new EntitySpawnGroupLootTableLoader().loadConfiguration(
             new CruxFolder(this, "entity_spawn_group_loot_tables").file()
         );
