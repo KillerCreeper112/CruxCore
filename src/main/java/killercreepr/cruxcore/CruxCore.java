@@ -667,6 +667,10 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
 
         loadBlockSoundGroups();
 
+        new TypedDataComponentLoader().loadConfiguration(
+            new CruxFolder(this, "typed_components_early").file()
+        );
+
         new LootTableLoader().loadConfiguration(
             new CruxFolder(this, "loot_tables").file()
         );
