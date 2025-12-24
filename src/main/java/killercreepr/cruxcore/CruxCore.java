@@ -653,11 +653,12 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     public void reload() {
         super.reload();
         DataFile globalLang = BukkitDataFile.parseFromGeneralPath(
-            CruxFolder.file(this, "global_lang.yml"),
+            CruxFolder.file(this, "global_lang.json"),
             false
         );
         if(globalLang != null){
             if(globalLang.getRoot() instanceof FileObject o){
+                globalLang.setPathSeparator('~');
                 o.forEach((id, ele) ->{
                     Communicator communicator = globalLang.deserialize(id, Communicator.class);
                     if(communicator == null) return;
