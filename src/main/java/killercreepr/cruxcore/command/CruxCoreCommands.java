@@ -478,6 +478,25 @@ public class CruxCoreCommands {
                 )
         ).then(
             Commands.literal("entity")
+              .then(
+                Commands.literal("snapshot")
+                  .then(
+                    Commands.argument("target", ArgumentTypes.entities())
+                      .executes(ctx ->{
+                        var sender = getExecutor(ctx.getSource());
+                        var list = ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                          .resolve(ctx.getSource());
+                        for(Entity e : list){
+                          var got = e.createSnapshot().getAsString();
+                          sender.sendMessage(Component.text(
+                            "Got: " + got
+                          ).hoverEvent(HoverEvent.showText(Component.text("Click to copy")))
+                            .clickEvent(ClickEvent.copyToClipboard(got)));
+                        }
+                        return 1;
+                      })
+                  )
+              )
                 .then(
                     Commands.literal("hp")
                         .then(
