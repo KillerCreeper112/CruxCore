@@ -22,13 +22,18 @@ import killercreepr.crux.api.communication.CreateSound;
 import killercreepr.crux.api.communication.CreateTitle;
 import killercreepr.crux.api.communication.boss.CreateBossBar;
 import killercreepr.crux.api.communication.lang.LangProvider;
+import killercreepr.crux.api.component.DataComponentType;
+import killercreepr.crux.api.component.TypedDataComponent;
+import killercreepr.crux.api.component.parser.DataComponentDecoder;
 import killercreepr.crux.api.data.DataExchange;
+import killercreepr.crux.api.entity.CruxEntity;
 import killercreepr.crux.api.plugin.module.CruxModule;
 import killercreepr.crux.api.text.tags.container.TagContainer;
 import killercreepr.crux.api.valueproviders.number.NumberProvider;
 import killercreepr.crux.core.Crux;
 import killercreepr.crux.core.command.argument.CruxCmdArguments;
 import killercreepr.crux.core.plugin.CruxPlugin;
+import killercreepr.crux.core.registries.CruxRegistries;
 import killercreepr.crux.core.util.CruxMath;
 import killercreepr.crux.core.util.CruxString;
 import killercreepr.crux.paper.ItemHolder;
@@ -478,6 +483,80 @@ public class CruxCoreCommands {
                 )
         ).then(
             Commands.literal("entity")
+              .then(
+                Commands.literal("components")
+                  .then(
+                    Commands.argument("target", ArgumentTypes.entities())
+                      .then(
+                        Commands.literal("apply")
+                          .then(
+                            Commands.argument("input", StringArgumentType.greedyString())
+                              .suggests((source, builder) ->{
+                                for (Map.Entry<Key, DataComponentType<?>> entry : CruxRegistries.DATA_COMPONENT_TYPE.entrySet()) {
+                                  builder.suggest(Crux.keyMinimalString(entry.getKey()));
+                                }
+                                return builder.buildFuture();
+                              })
+                              .executes(ctx ->{
+                                var sender = getExecutor(ctx.getSource());
+                                var rawInput = ctx.getArgument("input", String.class);
+                                var targets = ctx.getArgument("target",  EntitySelectorArgumentResolver.class)
+                                  .resolve(ctx.getSource());
+                                for (Entity e : targets) {
+                                  var crux = CruxEntity.entity(e);
+                                  Collection<TypedDataComponent<?>> parsed = DataComponentDecoder.componentDecoder().parseComponents(
+                                    Crux.format().deserializeString(rawInput, TagContainer.merged().hook(e))
+                                  );
+                                  parsed.forEach(crux::set);
+                                  sender.sendMessage("Applied " + parsed.size() + " components to " + e.getName());
+                                }
+                                return 1;
+                              })
+                          )
+                      ).then(
+                        Commands.literal("remove")
+                          .then(
+                            Commands.argument("input", StringArgumentType.string())
+                              .executes(ctx ->{
+                                var sender = getExecutor(ctx.getSource());
+                                var rawInput = ctx.getArgument("input", String.class);
+                                var targets = ctx.getArgument("target",  EntitySelectorArgumentResolver.class)
+                                  .resolve(ctx.getSource());
+
+                                Collection<DataComponentType<?>> types = new HashSet<>();
+                                String[] args = rawInput.replace(" ", "").split(",");
+                                for(String s : args){
+                                  Key key = Crux.key(s);
+                                  DataComponentType<?> type = CruxRegistries.DATA_COMPONENT_TYPE.get(key);
+                                  if(type == null) continue;
+                                  types.add(type);
+                                }
+
+                                for (Entity e : targets) {
+                                  var crux = CruxEntity.entity(e);
+                                  types.forEach(type -> crux.set(type, null));
+                                  sender.sendMessage("Removed " + types.size() + " components from " + e.getName());
+                                }
+                                return 1;
+                              })
+                          )
+                      ).then(
+                        Commands.literal("clear")
+                          .executes(ctx ->{
+                            var sender = getExecutor(ctx.getSource());
+                            var targets = ctx.getArgument("target",  EntitySelectorArgumentResolver.class)
+                              .resolve(ctx.getSource());
+
+                            for (Entity e : targets) {
+                              var crux = CruxEntity.entity(e);
+                              crux.clearComponents();
+                              sender.sendMessage("Cleared all components from " + e.getName());
+                            }
+                            return 1;
+                          })
+                      )
+                  )
+              )
               .then(
                 Commands.literal("snapshot")
                   .then(
