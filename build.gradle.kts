@@ -46,7 +46,7 @@ dependencies {
 }
 tasks{
     runServer{
-        jvmArgs("-Xmx6000M", "-Xms6000M")
+        jvmArgs("-Xmx4000M", "-Xms4000M")
     }
     assemble{
         dependsOn(shadowJar)
