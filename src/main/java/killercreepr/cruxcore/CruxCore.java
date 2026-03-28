@@ -110,13 +110,11 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
@@ -695,12 +693,12 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
             new CruxFolder(this, "typed_components_early").file()
         );
 
-        new EntitySpawnGroupLootTableLoader().loadConfiguration(
-            new CruxFolder(this, "entity_spawn_group_loot_tables").file()
+        new NaturalEntityGroupGroupCfgLoader().loadConfiguration(
+          new CruxFolder(this, "entity_spawn_groups").file()
         );
 
-        new NaturalEntityGroupGroupCfgLoader().loadConfiguration(
-            new CruxFolder(this, "entity_spawn_groups").file()
+        new EntitySpawnGroupLootTableLoader().loadConfiguration(
+            new CruxFolder(this, "entity_spawn_group_loot_tables").file()
         );
 
         MODULES.reload(this);

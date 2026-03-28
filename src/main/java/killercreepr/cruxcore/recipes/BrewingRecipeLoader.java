@@ -16,7 +16,6 @@ import killercreepr.cruxpotions.core.potions.DescribedPotion;
 import killercreepr.cruxpotions.core.registries.CruxPotionRegistries;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;

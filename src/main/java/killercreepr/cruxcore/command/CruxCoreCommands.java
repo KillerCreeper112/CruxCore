@@ -8,7 +8,6 @@ import com.google.gson.JsonParser;
 import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import eu.endercentral.crazy_advancements.CrazyAdvancementsAPI;
 import eu.endercentral.crazy_advancements.advancement.AdvancementDisplay;
 import eu.endercentral.crazy_advancements.advancement.ToastNotification;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
