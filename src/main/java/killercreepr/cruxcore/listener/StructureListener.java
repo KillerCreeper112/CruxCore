@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class StructureListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -291,12 +292,34 @@ public class StructureListener implements Listener {
         StructureWorldModule module = world.getModule(StructureWorldModule.class);
         if(module == null) return;
         Vector toVec = event.getTo().toVector();
-        ActiveStructure to = CruxCollection.getFirst(module.getActive(active ->{
+        var entering = module.getActive(active ->{
             StoredStructure check = active.getData();
             BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
             return box.contains(toVec);
-        }));
-        StoredStructure from = holder.getLastStructure();
+        }).stream()
+          .map(ActiveStructure::getData)
+          .collect(Collectors.toSet());
+        var previous = holder.getLastStructures();
+
+        for (var structure : entering) {
+            if (!previous.contains(structure)) {
+                new PlayerEnterStructureEvent(p, structure).callEvent();
+            }
+        }
+        for (var structure : previous) {
+            if (!entering.contains(structure)) {
+                new PlayerLeaveStructureEvent(p, structure).callEvent();
+            }
+        }
+        holder.getLastStructures().clear();
+        holder.getLastStructures().addAll(entering);
+
+        /*ActiveStructure to = CruxCollection.getFirst(module.getActive(active ->{
+            StoredStructure check = active.getData();
+            BoundingBox box = check.getOrDefault(StoredStructureComponents.OUTER_BOX, check.getBoundingBox());
+            return box.contains(toVec);
+        }));*/
+        /*StoredStructure from = holder.getLastStructure();
 
         Structure strucTo = getStructure(to == null ? null : to.getData());
         Structure strucFrom = getStructure(from);
@@ -310,7 +333,7 @@ public class StructureListener implements Listener {
             PlayerLeaveStructureEvent enter = new PlayerLeaveStructureEvent(p, from);
             enter.callEvent();
         }
-        holder.setLastStructure(to == null ? null : to.getData());
+        holder.setLastStructure(to == null ? null : to.getData());*/
     }
 
 }

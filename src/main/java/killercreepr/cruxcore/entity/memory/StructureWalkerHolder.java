@@ -7,6 +7,9 @@ import killercreepr.cruxstructures.api.structure.StoredStructure;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class StructureWalkerHolder extends PlayerDataHolder {
     public static final Key KEY = Crux.key("structure_walker");
     public StructureWalkerHolder(@NotNull Key key, @NotNull PlayerMemory parent) {
@@ -18,7 +21,12 @@ public class StructureWalkerHolder extends PlayerDataHolder {
     }
 
     protected long lastTicked;
-    protected StoredStructure lastStructure;
+    //protected StoredStructure lastStructure;
+    protected final Set<StoredStructure> lastStructures = new HashSet<>();
+
+    public Set<StoredStructure> getLastStructures() {
+        return lastStructures;
+    }
 
     public long getLastTicked() {
         return lastTicked;
@@ -28,11 +36,11 @@ public class StructureWalkerHolder extends PlayerDataHolder {
         this.lastTicked = lastTicked;
     }
 
-    public StoredStructure getLastStructure() {
+    /*public StoredStructure getLastStructure() {
         return lastStructure;
     }
 
     public void setLastStructure(StoredStructure lastStructure) {
         this.lastStructure = lastStructure;
-    }
+    }*/
 }
