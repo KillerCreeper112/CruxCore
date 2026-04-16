@@ -1,5 +1,6 @@
 package killercreepr.cruxcore.command;
 
+import com.destroystokyo.paper.MaterialTags;
 import com.destroystokyo.paper.entity.ai.Goal;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
@@ -48,10 +49,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Registry;
-import org.bukkit.Sound;
-import org.bukkit.WeatherType;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
@@ -215,6 +213,30 @@ public class CruxCoreCommands {
                             return 1;
                         })
                 )
+        ).then(
+          Commands.literal("vanilla")
+            .then(
+              Commands.literal("tag")
+                .then(
+                  Commands.argument("registry",  StringArgumentType.string())
+                    .suggests((ctx, builder) ->{
+                      builder.suggest("blocks");
+                      builder.suggest("items");
+                      return builder.buildFuture();
+                    })
+                    .then(
+                      Commands.argument("tag", StringArgumentType.string())
+                        .suggests((ctx, builder) ->{
+                          var registry = ctx.getLastChild().getArgument("registry", String.class);
+                          var tags = Bukkit.getTags(registry, Material.class);
+                          for (Tag<Material> tag : tags) {
+                            builder.suggest(tag.key().asString());
+                          }
+                          return builder.buildFuture();
+                        })
+                    )
+                )
+            )
         ).then(
             Commands.literal("lang")
                 .then(

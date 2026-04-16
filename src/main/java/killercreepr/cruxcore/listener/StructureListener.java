@@ -1,5 +1,7 @@
 package killercreepr.cruxcore.listener;
 
+import com.destroystokyo.paper.MaterialSetTag;
+import com.destroystokyo.paper.MaterialTags;
 import killercreepr.crux.api.communication.Communicator;
 import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
