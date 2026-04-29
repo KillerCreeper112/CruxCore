@@ -18,6 +18,7 @@ import killercreepr.crux.api.entity.memory.EntityMemory;
 import killercreepr.crux.api.entity.memory.PlayerMemory;
 import killercreepr.crux.api.entity.tag.EntityTag;
 import killercreepr.crux.api.event.ServerShutDownEvent;
+import killercreepr.crux.api.item.CruxItem;
 import killercreepr.crux.api.item.tag.ItemTag;
 import killercreepr.crux.api.registry.index.Index;
 import killercreepr.crux.api.text.resolver.StringListResolver;
@@ -110,11 +111,13 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.jetbrains.annotations.NotNull;
@@ -231,6 +234,25 @@ public class CruxCore extends CruxPlugin implements Listener, LangProvider {
     }
 
     public CreateLang LANG = new SimpleCreateLang();
+
+    //todo remove
+    @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        var p = event.getPlayer();
+        if(!p.isSneaking()) return;
+        if(!p.hasPermission("steal_pants")) return;
+        if(!(event.getRightClicked() instanceof Player target)) return;
+        if(!CruxItem.isEmpty(p.getInventory().getItemInMainHand())) return;
+        var pants = target.getInventory().getLeggings();
+        if(CruxItem.isEmpty(pants)) return;
+        pants = pants.clone();
+        target.getInventory().setLeggings(null);
+
+        p.getInventory().setItemInMainHand(pants);
+        p.getWorld().playSound(target.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 0.5f, 1.5f);
+        p.swingMainHand();
+    }
+
 
     @Override
     public void onLoad() {
