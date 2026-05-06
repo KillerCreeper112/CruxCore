@@ -377,33 +377,62 @@ public class CruxCoreCommands {
                 )
         ).then(
             Commands.literal("mob")
-                .then(
-                    Commands.literal("goals")
-                        .then(
-                            Commands.argument("target", ArgumentTypes.entity())
-                                .executes(ctx ->{
-                                    var sender = getExecutor(ctx.getSource());
-                                    for(Entity e : ctx.getArgument("target", EntitySelectorArgumentResolver.class)
-                                        .resolve(ctx.getSource())){
-                                        if(!(e instanceof Mob mob)) continue;
+              .then(
+                Commands.literal("goal")
+                  .then(
+                    Commands.literal("remove")
+                      .then(
+                        Commands.argument("target", ArgumentTypes.entities())
+                          .then(
+                            Commands.argument("key",  StringArgumentType.string())
+                              .executes(ctx ->{
+                                var sender = getExecutor(ctx.getSource());
+                                var key = ctx.getArgument("key", String.class);
+                                for(Entity e : ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                                  .resolve(ctx.getSource())){
+                                  if(!(e instanceof Mob mob)) continue;
 
-                                        int index = 0;
-                                        sender.sendMessage("Showing mob goals for " + mob.getName() + ":");
-                                        for (Goal<Mob> goal : plugin.getServer().getMobGoals().getAllGoals(mob)) {
-                                            index++;
-                                            sender.sendMessage(Component.empty()
-                                                    .clickEvent(ClickEvent.copyToClipboard(goal.getKey().getNamespacedKey().asString()))
-                                                .append(
-                                                    Component.text(
-                                                        "#" + index + " - " + goal.getKey().getNamespacedKey()
-                                                    )
-                                                ));
-                                        }
+                                  for (Goal<Mob> goal : plugin.getServer().getMobGoals().getAllGoals(mob)) {
+                                    if(!goal.getKey().getNamespacedKey().asString().equals(key)){
+                                      continue;
                                     }
-                                    return 1;
-                                })
-                        )
-                )
+                                    plugin.getServer().getMobGoals().removeGoal(mob, goal.getKey());
+                                    sender.sendMessage("Removed goal " + key + " from " + mob.getName());
+                                  }
+                                }
+                                return 1;
+                              })
+                          )
+                      )
+                  )
+                  .then(
+                    Commands.literal("list")
+                      .then(
+                        Commands.argument("target", ArgumentTypes.entity())
+                          .executes(ctx ->{
+                            var sender = getExecutor(ctx.getSource());
+                            for(Entity e : ctx.getArgument("target", EntitySelectorArgumentResolver.class)
+                              .resolve(ctx.getSource())){
+                              if(!(e instanceof Mob mob)) continue;
+
+                              int index = 0;
+                              sender.sendMessage("Showing mob goals for " + mob.getName() + ":");
+                              for (Goal<Mob> goal : plugin.getServer().getMobGoals().getAllGoals(mob)) {
+                                index++;
+                                sender.sendMessage(Component.empty()
+                                  .clickEvent(ClickEvent.copyToClipboard(goal.getKey().getNamespacedKey().asString()))
+                                  .append(
+                                    Component.text(
+                                      "#" + index + " - " + goal.getKey().getNamespacedKey()
+                                    )
+                                  ));
+                              }
+                            }
+                            return 1;
+                          })
+                      )
+                  )
+              )
         ).then(
             Commands.literal("player")
                 .then(
@@ -910,6 +939,37 @@ public class CruxCoreCommands {
                                 })
                         )
                 )
+        ).then(
+          Commands.literal("msglist")
+            .then(
+              Commands.argument("targets", ArgumentTypes.entities())
+                .then(
+                  Commands.argument("text", StringArgumentType.greedyString())
+                    .executes(ctx ->{
+                      Collection<Entity> targets = ctx.getArgument("targets", EntitySelectorArgumentResolver.class)
+                        .resolve(ctx.getSource());
+                      var text = List.of(ctx.getArgument("text", String.class));
+
+                      for(Entity p : targets){
+                        var output = Crux.format().deserializeList(text, TagContainer.merged()
+                          .hook(getExecutor(ctx.getSource()))
+                          .hook(p));
+                        for (Component msg : output) {
+                          p.sendMessage(msg);
+                        }
+                      }
+                      /*var output = Crux.format().deserializeList(text, TagContainer.merged()
+                        .hook(getExecutor(ctx.getSource())));*/
+
+                      getExecutor(ctx.getSource()).sendMessage(
+                        Component.text("Sent list message to " + targets.size() + " players")
+                          //.append(output)
+                      );
+
+                      return 1;
+                    })
+                )
+            )
         ).then(
             Commands.literal("playsound")
                 .then(
