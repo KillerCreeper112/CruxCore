@@ -37,7 +37,7 @@ dependencies {
     ))
 
     compileOnly(files(
-        "E:\\Plugins\\YO\\CruxCore\\run\\plugins\\CrazyAdvancementsAPI-2.21.9.jar"
+        "E:\\Plugins\\YO\\CruxCore\\run\\plugins\\CrazyAdvancementsAPI-26.3.0-mojmap.jar"
     ))
 
     compileOnly(fileTree("libs") {

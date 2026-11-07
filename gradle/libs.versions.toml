@@ -9,9 +9,9 @@ paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" 
 crunch = { group = "com.github.Redempt", name = "Crunch", version.ref = "crunch" }
 
 [versions]
-shadow = "9.4.1"
-paperweight = "2.0.0-beta.21"
-paper = "26.1.2.build.+"
+shadow = "9.6.1"
+paperweight = "2.0.0-beta.24"
+paper = "26.3.build.+"
 kotlin = "2.3.20"
-run_paper = "3.0.2"
+run_paper = "3.1.0"
 crunch = "2.0.3"

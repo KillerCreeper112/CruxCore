@@ -43,7 +43,7 @@ public class FurnaceRecipeLoader {
                 ingredientList.add(ingredientItem);
             });
             FurnaceRecipe recipe = new FurnaceRecipe(
-                CruxKey.key(recipeKey), resultItem, new RecipeChoice.ExactChoice(ingredientList),
+                CruxKey.key(recipeKey), resultItem, RecipeChoice.exactChoice(ingredientList),
                 o.get("experience").getAsFloat(), o.get("cooking_time").getAsInt()
             );
 
@@ -54,7 +54,7 @@ public class FurnaceRecipeLoader {
 
             if(o.has("blasting_experience")){
                 BlastingRecipe blastingRecipe = new BlastingRecipe(
-                    CruxKey.key(Crux.key("blasting/" + key)), resultItem, new RecipeChoice.ExactChoice(ingredientList),
+                    CruxKey.key(Crux.key("blasting/" + key)), resultItem, RecipeChoice.exactChoice(ingredientList),
                     o.get("blasting_experience").getAsFloat(), o.get("blasting_cooking_time").getAsInt()
                 );
                 r = server.getRecipe(blastingRecipe.getKey());
@@ -64,7 +64,7 @@ public class FurnaceRecipeLoader {
             }
             if(o.has("smoking_experience")){
                 SmokingRecipe blastingRecipe = new SmokingRecipe(
-                    CruxKey.key(Crux.key("smoking/" + key)), resultItem, new RecipeChoice.ExactChoice(ingredientList),
+                    CruxKey.key(Crux.key("smoking/" + key)), resultItem, RecipeChoice.exactChoice(ingredientList),
                     o.get("smoking_experience").getAsFloat(), o.get("smoking_cooking_time").getAsInt()
                 );
                 r = server.getRecipe(blastingRecipe.getKey());

@@ -1,6 +1,5 @@
 package killercreepr.cruxcore.recipes;
 
-import io.papermc.paper.potion.PotionMix;
 import killercreepr.crux.api.item.CruxItem;
 import killercreepr.crux.api.item.dynamic.DynamicItem;
 import killercreepr.crux.api.text.context.TextParserContext;
@@ -18,7 +17,9 @@ import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
 import org.bukkit.Registry;
 import org.bukkit.Server;
+import org.bukkit.inventory.BrewingRecipe;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ import java.util.logging.Level;
 public class BrewingRecipeLoader {
     public static final Map<Key, DisplayMix> DISPLAY_POTION_MIXES = new HashMap<>();
     public static final Map<Key, DisplayMix> NON_BREW_DISPLAY_POTION_MIXES = new HashMap<>();
-    public static final Map<Key, PotionMix> SPLASH_POTION_MIXES = new HashMap<>();
+    public static final Map<Key, BrewingRecipe> SPLASH_POTION_MIXES = new HashMap<>();
 
     public void load(@NotNull DataFile cfg, @NotNull Server server){
         if(!(cfg.getRoot() instanceof FileObject root)) return;
@@ -50,39 +51,39 @@ public class BrewingRecipeLoader {
 
             Key recipeKey = Crux.key(key);
 
-            server.getPotionBrewer().removePotionMix(CruxKey.key(recipeKey));
-            PotionMix mix = new PotionMix(CruxKey.key(recipeKey), resultItem,
-                PotionMix.createPredicateChoice(item ->{
-                    if(basePotionType != null){
-                        if(!input.equals(Crux.handlers().item().getType(item))) return false;
-                        if(!(item.getItemMeta() instanceof PotionMeta meta)) return false;
-                        return meta.getBasePotionType() != null && meta.getBasePotionType().key().equals(basePotionType);
-                    }
+            server.removeRecipe(CruxKey.key(recipeKey));
+            BrewingRecipe mix = new BrewingRecipe(CruxKey.key(recipeKey), resultItem, RecipeChoice.predicateChoice(item ->{
+                if(basePotionType != null){
+                    if(!input.equals(Crux.handlers().item().getType(item))) return false;
+                    if(!(item.getItemMeta() instanceof PotionMeta meta)) return false;
+                    return meta.getBasePotionType() != null && meta.getBasePotionType().key().equals(basePotionType);
+                }
 
                 return input.equals(Crux.handlers().item().getType(item));
-            }), PotionMix.createPredicateChoice(item ->{
+            }, Crux.handlers().item().getItem(input).value()), RecipeChoice.predicateChoice(item ->{
                 return ingredient.equals(Crux.handlers().item().getType(item));
-            }));
-            server.getPotionBrewer().addPotionMix(mix);
+            }, Crux.handlers().item().getItem(ingredient).value()));
+            server.addRecipe(mix);
 
             //SPLASH
             if(resultItem.getType() == Material.POTION){
                 Key itemKey = Crux.handlers().item().getType(resultItem);
                 ItemHolder holder = Crux.handlers().item().getItem(
-                    Crux.key(
-                        itemKey.namespace() + ":" + itemKey.value().replace("_potion", "_splash_potion")
-                    )
+                  Crux.key(
+                    itemKey.namespace() + ":" + itemKey.value().replace("_potion", "_splash_potion")
+                  )
                 );
                 if(holder != null){
                     recipeKey = Crux.key(holder.key().key().value());
-                    server.getPotionBrewer().removePotionMix(CruxKey.key(recipeKey));
-                    PotionMix mixSplash = new PotionMix(CruxKey.key(recipeKey), holder.value(),
-                        PotionMix.createPredicateChoice(item ->{
-                            return itemKey.equals(Crux.handlers().item().getType(item));
-                        }), PotionMix.createPredicateChoice(item ->{
-                        return Key.key("gunpowder").equals(Crux.handlers().item().getType(item));
-                    }));
-                    server.getPotionBrewer().addPotionMix(mixSplash);
+                    server.removeRecipe(CruxKey.key(recipeKey));
+                    BrewingRecipe mixSplash = new BrewingRecipe(CruxKey.key(recipeKey), holder.value(),
+                      RecipeChoice.predicateChoice(item ->{
+                          return itemKey.equals(Crux.handlers().item().getType(item));
+                      }, resultItem.clone()),
+                      RecipeChoice.predicateChoice(item ->{
+                          return Key.key("gunpowder").equals(Crux.handlers().item().getType(item));
+                      }, ItemType.GUNPOWDER.createItemStack()));
+                    server.addRecipe(mixSplash);
                     SPLASH_POTION_MIXES.put(mixSplash.key(), mixSplash);
                 }
             }
@@ -105,7 +106,7 @@ public class BrewingRecipeLoader {
                     }
 
                     DisplayMix displayMix = new DisplayMix(
-                        mix, displayInput, displayIngredient, cruxPotion
+                      mix, displayInput, displayIngredient, cruxPotion
                     );
 
                     DISPLAY_POTION_MIXES.put(mix.key(), displayMix);
@@ -118,33 +119,35 @@ public class BrewingRecipeLoader {
         for(CruxPotion potion : CruxPotionRegistries.POTION){
             if(!(potion instanceof DescribedPotion)) continue;
             if(DISPLAY_POTION_MIXES.containsKey(potion.key())) continue;
+            // Display-only recipe, never registered with the server. Uses the barrier
+            // placeholder as its choices instead of RecipeChoice.empty() so it is always valid.
             DisplayMix displayMix = new DisplayMix(
-                new PotionMix(
-                    CruxKey.key(potion.key()),
-                    CruxItem.create(Material.POTION)
-                        .customName("Potion of " + potion.getName())
-                        .editThis(c ->{
-                            c.set(PotionComponents.STORED_CRUX_POTIONS, List.of(StoredPotion.storedPotion(potion, 1200, 0)));
-                            Crux.handlers().item().update(c.item());
-                        })
-                        .item(),
-                    RecipeChoice.empty(), RecipeChoice.empty()
-                ),NOT_BREWABLE, NOT_BREWABLE, potion
+              new BrewingRecipe(
+                CruxKey.key(potion.key()),
+                CruxItem.create(Material.POTION)
+                  .customName("Potion of " + potion.getName())
+                  .editThis(c ->{
+                      c.set(PotionComponents.STORED_CRUX_POTIONS, List.of(StoredPotion.storedPotion(potion, 1200, 0)));
+                      Crux.handlers().item().update(c.item());
+                  })
+                  .item(),
+                RecipeChoice.exactChoice(NOT_BREWABLE), RecipeChoice.exactChoice(NOT_BREWABLE)
+              ),NOT_BREWABLE, NOT_BREWABLE, potion
             );
             NON_BREW_DISPLAY_POTION_MIXES.put(potion.key(), displayMix);
         }
     }
 
     protected final static ItemStack NOT_BREWABLE = CruxItem.create(Material.BARRIER)
-        .itemName("<red>This potion is not brewable")
-        .item();
+      .itemName("<red>This potion is not brewable")
+      .item();
     public static class DisplayMix{
-        protected final PotionMix mix;
+        protected final BrewingRecipe mix;
         protected final ItemStack input;
         protected final ItemStack ingredient;
         protected final CruxPotion cruxPotion;
 
-        public DisplayMix(PotionMix mix, ItemStack input, ItemStack ingredient, CruxPotion cruxPotion) {
+        public DisplayMix(BrewingRecipe mix, ItemStack input, ItemStack ingredient, CruxPotion cruxPotion) {
             this.mix = mix;
             this.input = input;
             this.ingredient = ingredient;
@@ -155,7 +158,7 @@ public class BrewingRecipeLoader {
             return cruxPotion;
         }
 
-        public PotionMix getMix() {
+        public BrewingRecipe getMix() {
             return mix;
         }
 

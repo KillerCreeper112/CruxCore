@@ -769,7 +769,7 @@ public class CruxCoreCommands {
                             String text = ctx.getArgument("text", String.class);
                             getExecutor(ctx.getSource()).sendMessage(
                                 Component.text(CruxString.latinFont(text))
-                                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, CruxString.latinFont(text)))
+                                    .clickEvent(ClickEvent.copyToClipboard(CruxString.latinFont(text)))
                                     .hoverEvent(HoverEvent.showText(Component.text("Click to copy")))
                             );
                             return 1;
@@ -1101,7 +1101,7 @@ public class CruxCoreCommands {
                                                         AdvancementDisplay.AdvancementFrame frame = AdvancementDisplay.AdvancementFrame.parseStrict(rawType);
                                                         String message = ctx.getArgument("message", String.class);
                                                         for(Player player : targets) {
-                                                            ToastNotification toast = new ToastNotification(item, message, frame);
+                                                            ToastNotification toast = new ToastNotification(item, Crux.format().deserialize(message), frame);
                                                             toast.send(player);
                                                             sender.sendMessage("Displayed toast to " + player.getName());
                                                         }
